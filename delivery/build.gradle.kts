@@ -1,16 +1,15 @@
 plugins {
-    id("urlshortener.spring-library-conventions")
-    kotlin("plugin.spring")
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.kotlin.spring)
 }
 
 dependencies {
     implementation(project(":core"))
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-hateoas")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("commons-validator:commons-validator:${Version.COMMONS_VALIDATOR}")
-    implementation("com.google.guava:guava:${Version.GUAVA}")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:${Version.MOCKITO}")
+    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.hateoas)
+    implementation(libs.commons.validator)
+    implementation(libs.guava)
+
+    testImplementation(rootProject.libs.spring.boot.starter.test)
 }

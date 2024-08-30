@@ -5,9 +5,6 @@ package es.unizar.urlshortener
 import es.unizar.urlshortener.infrastructure.delivery.ShortUrlDataOut
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment
@@ -20,6 +17,9 @@ import org.springframework.test.jdbc.JdbcTestUtils
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import java.net.URI
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class HttpRequestTest {
@@ -32,7 +32,7 @@ class HttpRequestTest {
     @Autowired
     private lateinit var restTemplate: TestRestTemplate
 
-    @BeforeEach
+    @BeforeTest
     fun setup() {
         val httpClient = HttpClientBuilder.create()
             .disableRedirectHandling()
@@ -42,7 +42,7 @@ class HttpRequestTest {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "shorturl", "click")
     }
 
-    @AfterEach
+    @AfterTest
     fun tearDowns() {
         JdbcTestUtils.deleteFromTables(jdbcTemplate, "shorturl", "click")
     }

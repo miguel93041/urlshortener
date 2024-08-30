@@ -26,6 +26,8 @@ class LogClickUseCaseImpl(
                 ip = data.ip
             )
         )
-        clickRepository.save(cl)
+        runCatching {
+            clickRepository.save(cl)
+        }
     }
 }

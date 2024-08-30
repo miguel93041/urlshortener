@@ -1,0 +1,47 @@
+[versions]
+kotlin = "2.0.20"
+springBoot = "3.3.3"
+
+mockitoKotlin = "5.4.0"
+
+bootstrap = "3.4.0"
+detekt = "1.23.6"
+jquery = "3.6.1"
+commonsValidator = "1.6"
+guava = "31.1-jre"
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin"}
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin"}
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin"}
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+
+[libraries]
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+
+# Spring Boot dependencies
+spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "springBoot"}
+spring-boot-starter = { module = "org.springframework.boot:spring-boot-starter" }
+spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-boot-starter-hateoas = { module = "org.springframework.boot:spring-boot-starter-hateoas" }
+spring-boot-starter-jdbc = { module = "org.springframework.boot:spring-boot-starter-jdbc" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+# Spring Boot managed dependencies
+httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5" }
+hsqldb = { module = "org.hsqldb:hsqldb"}
+
+# Other dependencies
+bootstrap = { module = "org.webjars:bootstrap", version.ref = "bootstrap" }
+jquery = { module = "org.webjars:jquery", version.ref = "jquery" }
+commons-validator = { module = "commons-validator:commons-validator", version.ref = "commonsValidator" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+mockito-kotlin =  { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
+
+
+

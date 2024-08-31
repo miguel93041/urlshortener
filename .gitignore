@@ -37,3 +37,6 @@ out/
 
 ### Cuarto ###
 README_files
+
+### Other ###
+.DS_Store

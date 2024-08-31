@@ -1,6 +1,7 @@
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.HashService
+import es.unizar.urlshortener.core.InternalError
 import es.unizar.urlshortener.core.InvalidUrlException
 import es.unizar.urlshortener.core.ShortUrl
 import es.unizar.urlshortener.core.ShortUrlProperties
@@ -60,7 +61,7 @@ class CreateShortUrlUseCaseTest {
 
         val createShortUrlUseCase = CreateShortUrlUseCaseImpl(shortUrlRepository, validatorService, hashService)
 
-        assertFailsWith<InvalidUrlException> {
+        assertFailsWith<InternalError> {
             createShortUrlUseCase.create("http://example.com/", shortUrlProperties)
         }
     }
@@ -77,7 +78,7 @@ class CreateShortUrlUseCaseTest {
 
         val createShortUrlUseCase = CreateShortUrlUseCaseImpl(shortUrlRepository, validatorService, hashService)
 
-        assertFailsWith<InvalidUrlException> {
+        assertFailsWith<InternalError> {
             createShortUrlUseCase.create("http://example.com/", shortUrlProperties)
         }
     }
@@ -95,7 +96,7 @@ class CreateShortUrlUseCaseTest {
 
         val createShortUrlUseCase = CreateShortUrlUseCaseImpl(shortUrlRepository, validatorService, hashService)
 
-        assertFailsWith<InvalidUrlException> {
+        assertFailsWith<InternalError> {
             createShortUrlUseCase.create("http://example.com/", shortUrlProperties)
         }
     }

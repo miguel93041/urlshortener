@@ -65,15 +65,29 @@ class UrlShortenerControllerImpl(
     val createShortUrlUseCase: CreateShortUrlUseCase
 ) : UrlShortenerController {
 
+    /**
+     * Redirects and logs a short url identified by its [id].
+     *
+     * @param id the identifier of the short url
+     * @param request the HTTP request
+     * @return a ResponseEntity with the redirection details
+     */
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> =
-        redirectUseCase.redirectTo(id).let {
+        redirectUseCase.redirectTo(id).run {
             logClickUseCase.logClick(id, ClickProperties(ip = request.remoteAddr))
             val h = HttpHeaders()
-            h.location = URI.create(it.target)
-            ResponseEntity<Unit>(h, HttpStatus.valueOf(it.mode))
+            h.location = URI.create(target)
+            ResponseEntity<Unit>(h, HttpStatus.valueOf(mode))
         }
 
+    /**
+     * Creates a short url from details provided in [data].
+     *
+     * @param data the data required to create a short url
+     * @param request the HTTP request
+     * @return a ResponseEntity with the created short url details
+     */
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> =
         createShortUrlUseCase.create(
@@ -82,14 +96,14 @@ class UrlShortenerControllerImpl(
                 ip = request.remoteAddr,
                 sponsor = data.sponsor
             )
-        ).let {
+        ).run {
             val h = HttpHeaders()
-            val url = linkTo<UrlShortenerControllerImpl> { redirectTo(it.hash, request) }.toUri()
+            val url = linkTo<UrlShortenerControllerImpl> { redirectTo(hash, request) }.toUri()
             h.location = url
             val response = ShortUrlDataOut(
                 url = url,
                 properties = mapOf(
-                    "safe" to it.properties.safe
+                    "safe" to properties.safe
                 )
             )
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)

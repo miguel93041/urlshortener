@@ -1,5 +1,6 @@
 package es.unizar.urlshortener.core.usecases
 
+import es.unizar.urlshortener.core.InternalError
 import es.unizar.urlshortener.core.Redirection
 import es.unizar.urlshortener.core.RedirectionNotFound
 import es.unizar.urlshortener.core.ShortUrl
@@ -40,7 +41,7 @@ class RedirectUseCaseTest {
         whenever(repository.findByKey("key")).thenThrow(RuntimeException())
         val useCase = RedirectUseCaseImpl(repository)
 
-        assertFailsWith<RedirectionNotFound> {
+        assertFailsWith<InternalError> {
             useCase.redirectTo("key")
         }
     }

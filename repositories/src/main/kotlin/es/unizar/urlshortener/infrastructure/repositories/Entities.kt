@@ -10,7 +10,7 @@ import java.time.OffsetDateTime
  */
 @Entity
 @Table(name = "click")
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "JpaObjectClassSignatureInspection")
 class ClickEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,7 +29,7 @@ class ClickEntity(
  */
 @Entity
 @Table(name = "shorturl")
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "JpaObjectClassSignatureInspection")
 class ShortUrlEntity(
     @Id
     val hash: String,

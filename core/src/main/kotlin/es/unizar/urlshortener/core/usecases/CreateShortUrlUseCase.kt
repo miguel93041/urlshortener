@@ -11,6 +11,13 @@ import es.unizar.urlshortener.core.*
  * **Note**: This is an example of functionality.
  */
 interface CreateShortUrlUseCase {
+    /**
+     * Creates a short URL for the given URL and optional data.
+     *
+     * @param url The URL to be shortened.
+     * @param data The optional properties for the short URL.
+     * @return The created [ShortUrl] entity.
+     */
     fun create(url: String, data: ShortUrlProperties): ShortUrl
 }
 
@@ -22,9 +29,17 @@ class CreateShortUrlUseCaseImpl(
     private val validatorService: ValidatorService,
     private val hashService: HashService
 ) : CreateShortUrlUseCase {
-    override fun create(url: String, data: ShortUrlProperties): ShortUrl = runCatching {
-        if (validatorService.isValid(url)) {
-            val id: String = hashService.hasUrl(url)
+    /**
+     * Creates a short URL for the given URL and optional data.
+     *
+     * @param url The URL to be shortened.
+     * @param data The optional properties for the short URL.
+     * @return The created [ShortUrl] entity.
+     * @throws InvalidUrlException if the URL is not valid.
+     */
+    override fun create(url: String, data: ShortUrlProperties): ShortUrl =
+        if (safeCall { validatorService.isValid(url) }) {
+            val id = safeCall { hashService.hasUrl(url) }
             val su = ShortUrl(
                 hash = id,
                 redirection = Redirection(target = url),
@@ -34,11 +49,8 @@ class CreateShortUrlUseCaseImpl(
                     sponsor = data.sponsor
                 )
             )
-            shortUrlRepository.save(su)
+            safeCall { shortUrlRepository.save(su) }
         } else {
             throw InvalidUrlException(url)
         }
-    }.onFailure {
-        throw InvalidUrlException(url)
-    }.getOrThrow()
 }

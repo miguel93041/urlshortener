@@ -10,6 +10,12 @@ import es.unizar.urlshortener.core.ClickRepositoryService
  * **Note**: This is an example of functionality.
  */
 interface LogClickUseCase {
+    /**
+     * Logs a click event for the given key and click properties.
+     *
+     * @param key The key associated with the redirection.
+     * @param data The properties of the click event.
+     */
     fun logClick(key: String, data: ClickProperties)
 }
 
@@ -19,6 +25,12 @@ interface LogClickUseCase {
 class LogClickUseCaseImpl(
     private val clickRepository: ClickRepositoryService
 ) : LogClickUseCase {
+    /**
+     * Logs a click event for the given key and click properties.
+     *
+     * @param key The key associated with the redirection.
+     * @param data The properties of the click event.
+     */
     override fun logClick(key: String, data: ClickProperties) {
         val cl = Click(
             hash = key,

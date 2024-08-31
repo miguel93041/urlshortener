@@ -11,6 +11,7 @@ class Application
 
 /**
  * The main entry point.
+ * @param args The command line arguments.
  */
 fun main(args: Array<String>) {
     @Suppress("SpreadOperator")

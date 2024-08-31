@@ -23,24 +23,52 @@ class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
     @Autowired val clickEntityRepository: ClickEntityRepository
 ) {
+    /**
+     * Provides an implementation of the ClickRepositoryService.
+     * @return an instance of ClickRepositoryServiceImpl.
+     */
     @Bean
     fun clickRepositoryService() = ClickRepositoryServiceImpl(clickEntityRepository)
 
+    /**
+     * Provides an implementation of the ShortUrlRepositoryService.
+     * @return an instance of ShortUrlRepositoryServiceImpl.
+     */
     @Bean
     fun shortUrlRepositoryService() = ShortUrlRepositoryServiceImpl(shortUrlEntityRepository)
 
+    /**
+     * Provides an implementation of the ValidatorService.
+     * @return an instance of ValidatorServiceImpl.
+     */
     @Bean
     fun validatorService() = ValidatorServiceImpl()
 
+    /**
+     * Provides an implementation of the HashService.
+     * @return an instance of HashServiceImpl.
+     */
     @Bean
     fun hashService() = HashServiceImpl()
 
+    /**
+     * Provides an implementation of the RedirectUseCase.
+     * @return an instance of RedirectUseCaseImpl.
+     */
     @Bean
     fun redirectUseCase() = RedirectUseCaseImpl(shortUrlRepositoryService())
 
+    /**
+     * Provides an implementation of the LogClickUseCase.
+     * @return an instance of LogClickUseCaseImpl.
+     */
     @Bean
     fun logClickUseCase() = LogClickUseCaseImpl(clickRepositoryService())
 
+    /**
+     * Provides an implementation of the CreateShortUrlUseCase.
+     * @return an instance of CreateShortUrlUseCaseImpl.
+     */
     @Bean
     fun createShortUrlUseCase() =
         CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())

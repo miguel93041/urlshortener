@@ -23,12 +23,13 @@ $(document).ready(
                      * @param {Object} request - The XMLHttpRequest object.
                      */
                     success: function (msg, status, request) {
+                        const imgSrc = `data:image/png;base64,${msg.qrCode}`;
                         $("#result").html(
                             "<div class='alert alert-success lead'><a target='_blank' href='"
                             + request.getResponseHeader('Location')
                             + "'>"
                             + request.getResponseHeader('Location')
-                            + "</a></div>");
+                            + `</a><img src=${imgSrc} alt='Generated QR Code' /></div>`);
                     },
                     /**
                      * Handles the AJAX error response.
@@ -40,4 +41,4 @@ $(document).ready(
                     }
                 });
             });
-    });
+});

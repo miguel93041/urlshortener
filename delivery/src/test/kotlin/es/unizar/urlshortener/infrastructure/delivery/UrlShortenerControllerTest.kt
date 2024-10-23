@@ -3,11 +3,10 @@
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.*
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.*
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
+import org.mockito.Mockito
 import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -42,6 +41,18 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var createShortUrlUseCase: CreateShortUrlUseCase
 
+    @MockBean
+    private lateinit var createQRUseCase: CreateQRUseCase
+
+    @MockBean
+    private lateinit var geoLocationService: GeoLocationService
+
+    @MockBean
+    private lateinit var redirectionLimitUseCase: RedirectionLimitUseCase
+
+    @MockBean
+    private lateinit var processCsvUseCase: ProcessCsvUseCase
+
     /**
      * Tests that `redirectTo` returns a redirect when the key exists.
      */
@@ -49,6 +60,8 @@ class UrlShortenerControllerTest {
     fun `redirectTo returns a redirect when the key exists`() {
         // Mock the behavior of redirectUseCase to return a redirection URL
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
+        given(redirectionLimitUseCase.isRedirectionLimit(Mockito.anyString())).willReturn(false)
+        given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
 
         // Perform a GET request and verify the response status and redirection URL
         mockMvc.perform(get("/{id}", "key"))
@@ -56,7 +69,7 @@ class UrlShortenerControllerTest {
             .andExpect(redirectedUrl("http://example.com/"))
 
         // Verify that logClickUseCase logs the click with the correct IP address
-        verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1"))
+        verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1", country = "Bogon"))
     }
 
     /**
@@ -67,6 +80,8 @@ class UrlShortenerControllerTest {
         // Mock the behavior of redirectUseCase to throw a RedirectionNotFound exception
         given(redirectUseCase.redirectTo("key"))
             .willAnswer { throw RedirectionNotFound("key") }
+        given(redirectionLimitUseCase.isRedirectionLimit(Mockito.anyString())).willReturn(false)
+        given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
 
         // Perform a GET request and verify the response status and error message
         mockMvc.perform(get("/{id}", "key"))
@@ -75,7 +90,7 @@ class UrlShortenerControllerTest {
             .andExpect(jsonPath("$.statusCode").value(404))
 
         // Verify that logClickUseCase does not log the click
-        verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1"))
+        verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1", country = "Bogon"))
     }
 
     /**
@@ -84,10 +99,12 @@ class UrlShortenerControllerTest {
     @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         // Mock the behavior of createShortUrlUseCase to return a ShortUrl object
+        given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
+        given(createQRUseCase.create(Mockito.anyString(), Mockito.anyInt())).willReturn(byteArrayOf())
         given(
             createShortUrlUseCase.create(
                 url = "http://example.com/",
-                data = ShortUrlProperties(ip = "127.0.0.1")
+                data = ShortUrlProperties(ip = "127.0.0.1", country = "Bogon")
             )
         ).willReturn(ShortUrl("f684a3c4", Redirection("http://example.com/")))
 
@@ -109,10 +126,12 @@ class UrlShortenerControllerTest {
     @Test
     fun `creates returns bad request if it can compute a hash`() {
         // Mock the behavior of createShortUrlUseCase to throw an InvalidUrlException
+        given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
+        given(createQRUseCase.create(Mockito.anyString(), Mockito.anyInt())).willReturn(byteArrayOf())
         given(
             createShortUrlUseCase.create(
                 url = "ftp://example.com/",
-                data = ShortUrlProperties(ip = "127.0.0.1")
+                data = ShortUrlProperties(ip = "127.0.0.1", country = "Bogon")
             )
         ).willAnswer { throw InvalidUrlException("ftp://example.com/") }
 

@@ -3,7 +3,6 @@ package es.unizar.urlshortener.infrastructure.delivery
 import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.GeoLocationService
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import es.unizar.urlshortener.core.ShortUrlProperties
 import es.unizar.urlshortener.core.usecases.CreateQRUseCase
 import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
@@ -62,7 +61,7 @@ data class ShortUrlDataIn(
 data class ShortUrlDataOut(
     val url: URI? = null,
     val properties: Map<String, Any> = emptyMap(),
-    val qrCode: ByteArray
+    val qrCode: ByteArray = byteArrayOf()
 )
 
 /**
@@ -91,7 +90,7 @@ class UrlShortenerControllerImpl(
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
         // Verifica si se ha alcanzado el límite de redirecciones
-        if (!redirectionLimitUseCase.checkRedirectionLimit(id)) {
+        if (redirectionLimitUseCase.isRedirectionLimit(id)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build()
         }
         val geoLocation = geoLocationService.get(request.remoteAddr)

@@ -1,18 +1,18 @@
 package es.unizar.urlshortener
 
-import es.unizar.urlshortener.core.usecases.CreateQRUseCaseImpl
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCaseImpl
-import es.unizar.urlshortener.core.usecases.LogClickUseCaseImpl
-import es.unizar.urlshortener.core.usecases.RedirectUseCaseImpl
+import es.unizar.urlshortener.core.GeoLocationService
+import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ClickEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryServiceImpl
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServiceImpl
+import es.unizar.urlshortener.thirdparties.ipinfo.GeoLocationServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.reactive.function.client.WebClient
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
@@ -37,6 +37,7 @@ class ApplicationConfiguration(
      */
     @Bean
     fun shortUrlRepositoryService() = ShortUrlRepositoryServiceImpl(shortUrlEntityRepository)
+
 
     /**
      * Provides an implementation of the ValidatorService.
@@ -80,4 +81,27 @@ class ApplicationConfiguration(
      */
     @Bean
     fun createQRUseCase() = CreateQRUseCaseImpl()
+
+    @Bean
+    fun ProcessCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")
+
+    @Bean
+    fun redirectionCountRepository(): RedirectionCountRepository {
+        return InMemoryRedirectionCountRepository()
+    }
+    @Bean
+    fun redirectionLimitUseCase(redirectionCountRepository: RedirectionCountRepository): RedirectionLimitUseCase {
+        return RedirectionLimitUseCaseImpl(redirectionLimit = 10, redirectionCountRepository)
+    }
+
+
+
+    @Bean
+    fun webClient(): WebClient = WebClient.builder().build()
+
+    @Bean
+    fun geoLocationService(webClient: WebClient): GeoLocationService {
+        return GeoLocationServiceImpl(webClient)
+    }
+
 }

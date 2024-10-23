@@ -52,3 +52,8 @@ data class ClickProperties(
     val platform: String? = null,
     val country: String? = null
 )
+
+data class GeoLocation(
+    val ip: String,
+    val country: String
+)

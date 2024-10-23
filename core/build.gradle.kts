@@ -6,7 +6,8 @@ plugins {
 dependencies {
     implementation("com.google.zxing:core:3.5.2")
     implementation("com.google.zxing:javase:3.5.2")
-
+    implementation ("com.opencsv:opencsv:5.5.2")
+    implementation ("org.apache.commons:commons-csv:1.9.0")
     // Add Kotlin test library for unit testing
     testImplementation(libs.kotlin.test)
 

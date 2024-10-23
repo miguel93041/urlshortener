@@ -35,7 +35,8 @@ class LogClickUseCaseImpl(
         val cl = Click(
             hash = key,
             properties = ClickProperties(
-                ip = data.ip
+                ip = data.ip,
+                country = data.country
             )
         )
         runCatching {

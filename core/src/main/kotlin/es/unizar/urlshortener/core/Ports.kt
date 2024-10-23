@@ -63,3 +63,7 @@ interface HashService {
      */
     fun hasUrl(url: String): String
 }
+
+interface GeoLocationService {
+    fun get(ip: String): GeoLocation
+}

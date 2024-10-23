@@ -40,3 +40,6 @@ README_files
 
 ### Other ###
 .DS_Store
+
+### Keys ###
+.env

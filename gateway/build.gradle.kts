@@ -25,12 +25,15 @@ dependencies {
     // Include Spring Boot Starter HATEOAS as an implementation dependency
     implementation(libs.spring.boot.starter.hateoas)
 
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     // Include Apache Commons Validator as an implementation dependency
     implementation(libs.commons.validator)
 
     // Include Google Guava as an implementation dependency
     implementation(libs.guava)
+
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
     // Include Kotlin Test as a test implementation dependency
     testImplementation(libs.kotlin.test)

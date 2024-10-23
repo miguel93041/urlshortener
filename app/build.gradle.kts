@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":delivery"))
     // Adds the repositories project as an implementation dependency.
     implementation(project(":repositories"))
+    implementation(project(":gateway"))
 
     // Adds the Spring Boot starter as an implementation dependency.
     implementation(libs.spring.boot.starter)
@@ -23,6 +24,8 @@ dependencies {
     implementation(libs.bootstrap)
     // Adds jQuery as an implementation dependency.
     implementation(libs.jquery)
+
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // Adds HSQLDB as a runtime-only dependency.
     runtimeOnly(libs.hsqldb)

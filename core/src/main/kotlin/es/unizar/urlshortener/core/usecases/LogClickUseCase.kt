@@ -36,7 +36,9 @@ class LogClickUseCaseImpl(
             hash = key,
             properties = ClickProperties(
                 ip = data.ip,
-                country = data.country
+                country = data.country,
+                browser = data.browser,
+                platform = data.platform
             )
         )
         runCatching {

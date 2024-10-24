@@ -94,8 +94,6 @@ class ApplicationConfiguration(
         return RedirectionLimitUseCaseImpl(redirectionLimit = 10, redirectionCountRepository)
     }
 
-
-
     @Bean
     fun webClient(): WebClient = WebClient.builder().build()
 
@@ -104,4 +102,6 @@ class ApplicationConfiguration(
         return GeoLocationServiceImpl(webClient)
     }
 
+    @Bean
+    fun browserPlatformIdentificationUseCase() = BrowserPlatformIdentificationUseCaseImpl()
 }

@@ -83,21 +83,21 @@ class UrlShortenerControllerImpl(
      * @param request the HTTP request
      * @return a ResponseEntity with the redirection details
      */
-    @GetMapping("/{id:(?!api|index).*}")
+    @GetMapping("/{id:(?!api|index|favicon\\.ico).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
         // Verifica si se ha alcanzado el límite de redirecciones
         if (redirectionLimitUseCase.isRedirectionLimit(id)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build()
         }
         val geoLocation = geoLocationService.get(request.remoteAddr)
-        val (browser, platform) = browserPlatformIdentificationUseCase.parse(request.getHeader("User-Agent"))
+        val browserPlatform = browserPlatformIdentificationUseCase.parse(request.getHeader("User-Agent"))
 
-        return redirectUseCase.redirectTo(id).run {
+            return redirectUseCase.redirectTo(id).run {
             logClickUseCase.logClick(id, ClickProperties(
                 ip = geoLocation.ip,
                 country = geoLocation.country,
-                browser = browser,
-                platform = platform
+                browser = browserPlatform.browser,
+                platform = browserPlatform.platform
             ))
             val h = HttpHeaders()
             h.location = URI.create(target)

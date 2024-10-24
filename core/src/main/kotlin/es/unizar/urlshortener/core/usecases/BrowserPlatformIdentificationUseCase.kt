@@ -1,5 +1,6 @@
 package es.unizar.urlshortener.core.usecases
 
+import es.unizar.urlshortener.core.BrowserPlatform
 import es.unizar.urlshortener.core.InvalidUrlException
 import ua_parser.Parser
 
@@ -13,7 +14,7 @@ interface BrowserPlatformIdentificationUseCase {
      * @param userAgent The user agent header request.
      * @return The browser and platform used during redirection requests.
      */
-    fun parse(userAgent: String): Pair<String, String>
+    fun parse(userAgent: String): BrowserPlatform
 }
 
 /**
@@ -27,13 +28,13 @@ class BrowserPlatformIdentificationUseCaseImpl : BrowserPlatformIdentificationUs
      * @return The browser and platform used during redirection requests.
      * @throws InvalidUrlException if the URL is not valid.
      */
-    override fun parse(userAgent: String): Pair<String, String> {
+    override fun parse(userAgent: String): BrowserPlatform {
         val parser = Parser()
         val client = parser.parse(userAgent)
 
-        val browser = "${client.userAgent.family} ${client.userAgent.major}.${client.userAgent.minor}"
+        val browser = "${client.userAgent.family}"
         val platform = client.os.family
 
-        return browser to platform
+        return BrowserPlatform(browser, platform)
     }
 }

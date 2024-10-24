@@ -1,6 +1,5 @@
 package es.unizar.urlshortener.core.usecases
 
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import kotlin.test.Test
 
@@ -17,7 +16,6 @@ class RedirectionLimitUseCaseTest {
         useCase.incrementRedirectionCount(urlId)
         useCase.incrementRedirectionCount(urlId)
 
-
-        assertFalse(useCase.checkRedirectionLimit(urlId))  // Debería devolver false ya que el límite es 3
+        assertTrue(useCase.isRedirectionLimit(urlId))  // Debería devolver true ya que el límite es 3
     }
 }

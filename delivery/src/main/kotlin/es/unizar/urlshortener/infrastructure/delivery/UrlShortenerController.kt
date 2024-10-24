@@ -56,7 +56,7 @@ data class ShortUrlDataIn(
 data class ShortUrlDataOut(
     val url: URI? = null,
     val properties: Map<String, Any> = emptyMap(),
-    val qrCode: ByteArray
+    val qrCode: ByteArray = byteArrayOf()
 )
 
 /**
@@ -86,7 +86,7 @@ class UrlShortenerControllerImpl(
     @GetMapping("/{id:(?!api|index).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
         // Verifica si se ha alcanzado el límite de redirecciones
-        if (!redirectionLimitUseCase.checkRedirectionLimit(id)) {
+        if (redirectionLimitUseCase.isRedirectionLimit(id)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build()
         }
         val geoLocation = geoLocationService.get(request.remoteAddr)

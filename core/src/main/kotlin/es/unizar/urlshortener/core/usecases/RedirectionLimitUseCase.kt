@@ -1,7 +1,7 @@
 package es.unizar.urlshortener.core.usecases
 
 interface RedirectionLimitUseCase {
-    fun checkRedirectionLimit(urlId: String): Boolean
+    fun isRedirectionLimit(urlId: String): Boolean
     fun incrementRedirectionCount(urlId: String)
 }
 
@@ -15,9 +15,9 @@ class RedirectionLimitUseCaseImpl(
     val redirectionCountRepository: RedirectionCountRepository
 ) : RedirectionLimitUseCase {
 
-    override fun checkRedirectionLimit(urlId: String): Boolean {
+    override fun isRedirectionLimit(urlId: String): Boolean {
         val currentCount = redirectionCountRepository.getCount(urlId) ?: 0
-        return currentCount < redirectionLimit
+        return currentCount >= redirectionLimit
     }
 
     override fun incrementRedirectionCount(urlId: String) {

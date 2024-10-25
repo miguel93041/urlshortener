@@ -9,7 +9,7 @@ dependencies {
     implementation ("com.opencsv:opencsv:5.5.2")
     implementation ("org.apache.commons:commons-csv:1.9.0")
     implementation("com.github.ua-parser:uap-java:1.6.1")
-
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // Add Kotlin test library for unit testing
     testImplementation(libs.kotlin.test)

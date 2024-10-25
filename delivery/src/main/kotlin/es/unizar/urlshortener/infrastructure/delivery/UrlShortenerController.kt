@@ -112,7 +112,8 @@ class UrlShortenerControllerImpl(
     }
 
     @PostMapping("/api/upload-csv", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile, request: HttpServletRequest): ResponseEntity<StreamingResponseBody> {
+    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile,
+                           request: HttpServletRequest): ResponseEntity<StreamingResponseBody> {
         val reader = InputStreamReader(file.inputStream.buffered())
 
         val responseBody = StreamingResponseBody { outputStream ->
@@ -138,6 +139,7 @@ class UrlShortenerControllerImpl(
      * @param request the HTTP request
      * @return a ResponseEntity with the created short url details
      */
+    @Suppress("ReturnCount")
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> {
         if (!urlAccessibilityCheckUseCase.isUrlReachable(data.url)) {

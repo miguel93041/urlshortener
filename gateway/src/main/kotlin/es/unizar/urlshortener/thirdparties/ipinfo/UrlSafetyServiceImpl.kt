@@ -12,6 +12,7 @@ class UrlSafetyServiceImpl (
 
     private val accessToken = System.getenv(DOTENV_SAFEBROWSING_KEY) ?: dotenv[DOTENV_SAFEBROWSING_KEY]
 
+    @Suppress("TooGenericExceptionThrown")
     override fun isSafe(url: String): Boolean {
         val requestUrl = buildRequestUrl()
 

@@ -13,20 +13,24 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @ExtendWith(MockitoExtension::class)
-class UrlSafetyServiceImplTest {
+class UrlSafetyServiceTest {
 
     @Mock
     private lateinit var webClient: WebClient
 
+    @Suppress("UnusedPrivateProperty")
     @Mock
     private lateinit var webClientBuilder: WebClient.Builder
 
+    @Suppress("UnusedPrivateProperty")
     @Mock
     private lateinit var requestBodyUriSpec: WebClient.RequestBodyUriSpec
 
+    @Suppress("UnusedPrivateProperty")
     @Mock
     private lateinit var responseSpec: WebClient.ResponseSpec
 
+    @Suppress("UnusedPrivateProperty")
     @Mock
     private lateinit var dotenv: Dotenv
 
@@ -34,7 +38,6 @@ class UrlSafetyServiceImplTest {
     private lateinit var urlSafetyService: UrlSafetyServiceImpl
 
     private val testUrl = "http://example.com"
-    private val testApiKey = "test-api-key"
 
     @Test
     fun `isSafe should return true when API response has no matches`() {

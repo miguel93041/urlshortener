@@ -76,6 +76,7 @@ class UrlShortenerControllerImpl(
     val redirectionLimitUseCase: RedirectionLimitUseCase,
     val browserPlatformIdentificationUseCase: BrowserPlatformIdentificationUseCase,
     val processCsvUseCase: ProcessCsvUseCase,
+    val urlValidationService: UrlValidationService,
 ) : UrlShortenerController {
 
     /**
@@ -135,6 +136,11 @@ class UrlShortenerControllerImpl(
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> {
         val geoLocation = geoLocationService.get(request.remoteAddr)
 
+        val isSafe = urlValidationService.validate(data.url).isSafe
+
+        if (!isSafe) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ShortUrlDataOut())
+        }
         return createShortUrlUseCase.create(
             url = data.url,
             data = ShortUrlProperties(

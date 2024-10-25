@@ -1,6 +1,7 @@
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.ShortUrlProperties
+import es.unizar.urlshortener.core.usecases.UrlValidationService
 import java.io.InputStreamReader
 import java.io.StringWriter
 
@@ -22,7 +23,7 @@ class ProcessCsvUseCaseImpl (
             br.forEachLine { line ->
                 val originalUrl = line.trim()
                 try {
-                    // Acortar la URL
+
                     val shortUrl = createShortUrlUseCase.create(originalUrl, ShortUrlProperties()) // se crea el hash
                     val shortenedUrl = "$baseUrl/${shortUrl.hash}" // con la base se forma la url completa
                     result.append("$originalUrl,$shortenedUrl\n") // para meterla en el fichero

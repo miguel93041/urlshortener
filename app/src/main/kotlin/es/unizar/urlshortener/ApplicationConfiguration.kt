@@ -11,6 +11,7 @@ import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryService
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServiceImpl
 import es.unizar.urlshortener.thirdparties.ipinfo.GeoLocationServiceImpl
+import es.unizar.urlshortener.thirdparties.ipinfo.UrlSafetyServiceImpl
 import io.github.cdimascio.dotenv.Dotenv
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -113,6 +114,11 @@ class ApplicationConfiguration(
     @Bean
     fun geoLocationService(webClient: WebClient, dotEnv: Dotenv): GeoLocationService {
         return GeoLocationServiceImpl(webClient, dotEnv)
+    }
+
+    @Bean
+    fun urlSafetyService(webClient: WebClient, dotEnv: Dotenv): UrlValidationService {
+        return UrlSafetyServiceImpl(webClient, dotEnv)
     }
 
     @Bean

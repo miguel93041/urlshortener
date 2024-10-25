@@ -53,6 +53,9 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var processCsvUseCase: ProcessCsvUseCase
 
+    @MockBean
+    private lateinit var browserPlatformIdentificationUseCase: BrowserPlatformIdentificationUseCase
+
     /**
      * Tests that `redirectTo` returns a redirect when the key exists.
      */
@@ -62,14 +65,18 @@ class UrlShortenerControllerTest {
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
         given(redirectionLimitUseCase.isRedirectionLimit(Mockito.anyString())).willReturn(false)
         given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
+        given(browserPlatformIdentificationUseCase.parse(Mockito.anyString()))
+            .willReturn(BrowserPlatform("Chrome", "Windows"))
 
         // Perform a GET request and verify the response status and redirection URL
-        mockMvc.perform(get("/{id}", "key"))
+        mockMvc.perform(get("/{id}", "key").header("User-Agent", "some-user-agent"))
             .andExpect(status().isTemporaryRedirect)
             .andExpect(redirectedUrl("http://example.com/"))
 
         // Verify that logClickUseCase logs the click with the correct IP address
-        verify(logClickUseCase).logClick("key", ClickProperties(ip = "127.0.0.1", country = "Bogon"))
+        verify(logClickUseCase).logClick(
+            "key",
+            ClickProperties(ip = "127.0.0.1", country = "Bogon", browser = "Chrome", platform = "Windows"))
     }
 
     /**
@@ -82,15 +89,18 @@ class UrlShortenerControllerTest {
             .willAnswer { throw RedirectionNotFound("key") }
         given(redirectionLimitUseCase.isRedirectionLimit(Mockito.anyString())).willReturn(false)
         given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
+        given(browserPlatformIdentificationUseCase.parse(Mockito.anyString()))
+            .willReturn(BrowserPlatform("Chrome", "Windows"))
 
         // Perform a GET request and verify the response status and error message
-        mockMvc.perform(get("/{id}", "key"))
+        mockMvc.perform(get("/{id}", "key").header("User-Agent", "some-user-agent"))
             .andDo(print())
             .andExpect(status().isNotFound)
             .andExpect(jsonPath("$.statusCode").value(404))
 
         // Verify that logClickUseCase does not log the click
-        verify(logClickUseCase, never()).logClick("key", ClickProperties(ip = "127.0.0.1", country = "Bogon"))
+        verify(logClickUseCase, never()).logClick("key",
+            ClickProperties(ip = "127.0.0.1", country = "Bogon", browser = "Chrome", platform = "Windows"))
     }
 
     /**

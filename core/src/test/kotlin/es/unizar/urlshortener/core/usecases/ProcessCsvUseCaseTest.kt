@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.BDDMockito.given
+import org.mockito.Mockito
 import org.mockito.Mockito.*
 import java.io.StringReader
 import java.io.StringWriter
@@ -14,15 +16,25 @@ import java.time.OffsetDateTime
 class ProcessCsvUseCaseTest {
     private val createShortUrlUseCase = mock(CreateShortUrlUseCase::class.java)
     private val baseUrlProvider = mock(BaseUrlProvider::class.java)
-    private val geoLocation = mock(GeoLocationService::class.java)
+    private val geoLocationService = mock(GeoLocationService::class.java)
     private val urlAccessibilityCheckUseCase = mock(UrlAccessibilityCheckUseCase::class.java)
-    private val processCsvUseCase = ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider, geoLocation, urlAccessibilityCheckUseCase)
+    private val urlSafetyService = mock(UrlSafetyService::class.java)
+    private val processCsvUseCase = ProcessCsvUseCaseImpl(createShortUrlUseCase,
+        baseUrlProvider,
+        geoLocationService,
+        urlAccessibilityCheckUseCase,
+        urlSafetyService,
+    )
     private val baseUrl = "http://localhost:8080"
     private val request = mock(HttpServletRequest::class.java)
 
     @BeforeEach
     fun setUp() {
         `when`(baseUrlProvider.get()).thenReturn(baseUrl)
+        `when`(request.remoteAddr).thenReturn("127.0.0.1")
+        given(urlAccessibilityCheckUseCase.isUrlReachable(Mockito.anyString())).willReturn(true)
+        given(urlSafetyService.isSafe(Mockito.anyString())).willReturn(true)
+        given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
     }
 
     @Test
@@ -39,7 +51,8 @@ class ProcessCsvUseCaseTest {
             created = OffsetDateTime.now(),
             properties = ShortUrlProperties()
         )
-        `when`(createShortUrlUseCase.create(input, ShortUrlProperties())).thenReturn(shortUrl)
+        `when`(createShortUrlUseCase.create(input, ShortUrlProperties(ip = "127.0.0.1", country = "Bogon")))
+            .thenReturn(shortUrl)
 
         processCsvUseCase.processCsv(reader, writer, request)
 
@@ -54,7 +67,7 @@ class ProcessCsvUseCaseTest {
         val writer = StringWriter()
 
         // Mock the behavior of createShortUrlUseCase to throw an exception for an invalid URL
-        `when`(createShortUrlUseCase.create(input, ShortUrlProperties()))
+        `when`(createShortUrlUseCase.create(input, ShortUrlProperties(ip = "127.0.0.1", country = "Bogon")))
             .thenThrow(IllegalArgumentException("Invalid URL"))
 
         processCsvUseCase.processCsv(reader, writer, request)
@@ -100,11 +113,14 @@ class ProcessCsvUseCaseTest {
             properties = ShortUrlProperties()
         )
 
-        `when`(createShortUrlUseCase.create("http://example.com", ShortUrlProperties()))
+        `when`(createShortUrlUseCase
+            .create("http://example.com", ShortUrlProperties(ip = "127.0.0.1", country = "Bogon")))
             .thenReturn(shortUrl1)
-        `when`(createShortUrlUseCase.create("invalid-url", ShortUrlProperties()))
+        `when`(createShortUrlUseCase
+            .create("invalid-url", ShortUrlProperties(ip = "127.0.0.1", country = "Bogon")))
             .thenThrow(IllegalArgumentException("Invalid URL"))
-        `when`(createShortUrlUseCase.create("http://another-example.com", ShortUrlProperties()))
+        `when`(createShortUrlUseCase
+            .create("http://another-example.com", ShortUrlProperties(ip = "127.0.0.1", country = "Bogon")))
             .thenReturn(shortUrl2)
 
         processCsvUseCase.processCsv(reader, writer, request)

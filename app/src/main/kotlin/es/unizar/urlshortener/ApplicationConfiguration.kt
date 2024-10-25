@@ -5,6 +5,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.BaseUrlProvider
 import es.unizar.urlshortener.core.BaseUrlProviderImpl
 import es.unizar.urlshortener.core.GeoLocationService
+import es.unizar.urlshortener.core.UrlSafetyService
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
@@ -13,6 +14,7 @@ import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryService
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServiceImpl
 import es.unizar.urlshortener.thirdparties.ipinfo.GeoLocationServiceImpl
+import es.unizar.urlshortener.thirdparties.ipinfo.UrlSafetyServiceImpl
 import io.github.cdimascio.dotenv.Dotenv
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -105,9 +107,15 @@ class ApplicationConfiguration(
         createShortUrlUseCase: CreateShortUrlUseCase,
         baseUrlProvider: BaseUrlProvider,
         geoLocationService: GeoLocationService,
-        urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase
+        urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase,
+        urlSafetyService: UrlSafetyService
     ): ProcessCsvUseCase {
-        return ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider, geoLocationService, urlAccessibilityCheckUseCase)
+        return ProcessCsvUseCaseImpl(createShortUrlUseCase,
+            baseUrlProvider,
+            geoLocationService,
+            urlAccessibilityCheckUseCase,
+            urlSafetyService,
+        )
     }
 
     /**
@@ -159,6 +167,11 @@ class ApplicationConfiguration(
      * Provides a Parser.
      * @return an instance of Parser.
      */
+    @Bean
+    fun urlSafetyService(webClient: WebClient, dotEnv: Dotenv): UrlSafetyService {
+        return UrlSafetyServiceImpl(webClient, dotEnv)
+    }
+
     @Bean
     fun uaParser(): Parser = Parser()
 

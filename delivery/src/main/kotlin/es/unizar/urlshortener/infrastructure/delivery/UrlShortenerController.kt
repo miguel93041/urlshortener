@@ -5,6 +5,7 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.GeoLocationService
 
 import es.unizar.urlshortener.core.ShortUrlProperties
+import es.unizar.urlshortener.core.UrlSafetyService
 import es.unizar.urlshortener.core.usecases.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
@@ -20,12 +21,10 @@ import java.net.URI
 
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.core.io.ByteArrayResource
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.io.StringWriter
 
 /**
  * The specification of the controller.
@@ -81,6 +80,7 @@ class UrlShortenerControllerImpl(
     val browserPlatformIdentificationUseCase: BrowserPlatformIdentificationUseCase,
     val processCsvUseCase: ProcessCsvUseCase,
     val urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase,
+    val urlValidationService: UrlSafetyService,
 ) : UrlShortenerController {
 
     /**
@@ -112,7 +112,8 @@ class UrlShortenerControllerImpl(
     }
 
     @PostMapping("/api/upload-csv", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile, request: HttpServletRequest): ResponseEntity<StreamingResponseBody> {
+    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile,
+                           request: HttpServletRequest): ResponseEntity<StreamingResponseBody> {
         val reader = InputStreamReader(file.inputStream.buffered())
 
         val responseBody = StreamingResponseBody { outputStream ->
@@ -138,10 +139,15 @@ class UrlShortenerControllerImpl(
      * @param request the HTTP request
      * @return a ResponseEntity with the created short url details
      */
+    @Suppress("ReturnCount")
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> {
         if (!urlAccessibilityCheckUseCase.isUrlReachable(data.url)) {
             return ResponseEntity(ShortUrlDataOut(), HttpStatus.BAD_REQUEST)
+        }
+
+        if (!urlValidationService.isSafe(data.url)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ShortUrlDataOut())
         }
 
         val geoLocation = geoLocationService.get(request.remoteAddr)

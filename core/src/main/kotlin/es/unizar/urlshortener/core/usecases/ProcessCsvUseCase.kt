@@ -4,6 +4,7 @@ package es.unizar.urlshortener.core.usecases
 import es.unizar.urlshortener.core.BaseUrlProvider
 import es.unizar.urlshortener.core.GeoLocationService
 import es.unizar.urlshortener.core.ShortUrlProperties
+import es.unizar.urlshortener.core.UrlSafetyService
 import jakarta.servlet.http.HttpServletRequest
 import java.io.*
 
@@ -40,7 +41,8 @@ class ProcessCsvUseCaseImpl (
     private val createShortUrlUseCase: CreateShortUrlUseCase,
     private val baseUrlProvider: BaseUrlProvider,
     private val geoLocationService: GeoLocationService,
-    private val urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase
+    private val urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase,
+    private val urlSafetyService: UrlSafetyService
 ) : ProcessCsvUseCase {
 
     /**
@@ -63,6 +65,9 @@ class ProcessCsvUseCaseImpl (
                 try {
                     if (!urlAccessibilityCheckUseCase.isUrlReachable(originalUrl)) {
                         writer.append("$originalUrl,ERROR: Not reachable\n")
+                    }
+                    if (!urlSafetyService.isSafe(originalUrl)) {
+                        writer.append("$originalUrl,ERROR: Not safe\n")
                     } else {
                         val shortUrl = createShortUrlUseCase.create(originalUrl, ShortUrlProperties(
                             ip = geoLocation.ip,

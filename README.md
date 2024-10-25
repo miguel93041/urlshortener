@@ -216,3 +216,93 @@ The following guides illustrate how to use some features concretely:
   Spring](https://spring.io/guides/tutorials/rest/)
 - [Accessing Data with
   JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+
+
+# Project Report: Proof of Concept (PoC) for URL Shortener
+
+## Introduction
+This report presents the Proof of Concept (PoC) for a URL shortener. Each feature outlined below has been implemented with minimal functionality to demonstrate its feasibility and validate its integration within the existing codebase. Each feature is documented with a brief description and usage instructions.
+
+## 1. QR Code Generation
+### Description
+Generate a QR code for any shortened URL, offering an alternative access method.
+
+### Usage
+To use this feature, users simply provide a URL, and the system generates a corresponding QR code. Users can scan the QR code with any compatible device to access the original URL.
+
+### Validation
+- **Correctness**: Ensure that the QR code generated correctly corresponds to the shortened URL, and they properly redirect.
+- **Scalability**: Analyze the response time when generating thousands of QR codes per second, and consider implementing load balancing or caching to mitigate server strain.
+- **Professionalism**: Provide a clean code structure with detailed comments, and ensure test coverage for different QR code formats and URL lengths.
+
+## 2. Browser and Platform Identification
+### Description
+Analyze HTTP headers to identify the browser (e.g., Chrome, Firefox) and platform (e.g., Windows, macOS, Linux) used during redirection requests.
+
+### Usage
+This feature works automatically upon each redirection request, capturing and logging the browser and platform information for each user accessing the shortened URL.
+
+### Validation
+- **Correctness**: Test cases to confirm the correct browser and OS identification for a variety of common user agents.
+- **Scalability**: Conduct tests that simulate high traffic, and verify that browser/platform detection does not become a bottleneck. Consider using lightweight parsing libraries that handle HTTP headers at scale.
+- **Professionalism**: Include unit tests to ensure coverage of different types of HTTP headers and platforms.
+
+## 3. Geolocation Service
+### Description
+Provide the client’s geographical location based on their IP address. This is useful for tracking both the user requesting a redirection and the user who clicked the shortened URL.
+
+### Usage
+This feature activates automatically for each redirection, providing the location of users in terms of country and region based on their IP address.
+
+### Validation
+- **Correctness**: Test with various IPs to confirm the service returns the correct location data.
+- **Scalability**: Simulate thousands of simultaneous redirections and measure how efficiently the geolocation service responds. Implement optimizations like result caching for frequent IPs to reduce external API calls.
+- **Professionalism**: Include clear documentation on the implementation and handling of IP geolocation services, ensuring the use of appropriate data sources and security measures.
+
+## 4. URL Accessibility Check
+### Description
+Ensure that a URL is reachable before allowing it to be shortened.
+
+### Usage
+Users submit a URL, which the system verifies for reachability before generating a shortened link. Unreachable URLs are flagged and rejected.
+
+### Validation
+- **Correctness**: Implement test cases to validate the accessibility of various URLs and ensure unreachable URLs are rejected.
+- **Scalability**: Perform load testing to confirm the system can handle mass URL checks in a reasonable time frame.
+- **Professionalism**: Include documentation explaining how URL accessibility is verified and ensure test coverage for both valid and invalid URLs.
+
+## 5. Google Safe Browsing Check
+### Description
+Validate the safety of a URL using the Google Safe Browsing API, ensuring users are not redirected to malicious sites.
+
+### Usage
+Before URL shortening, each URL is evaluated for safety. If flagged as unsafe by Google Safe Browsing, the URL is rejected.
+
+### Validation
+- **Correctness**: Test with a variety of URLs to confirm that unsafe URLs are correctly flagged and rejected.
+- **Scalability**: Use stress tests to simulate high traffic and verify the system's responsiveness when making API calls.
+- **Professionalism**: Provide detailed documentation on the API integration and ensure that error handling and edge cases are well covered in tests. Ensure the API is utilized securely with key management practices.
+
+## 6. CSV Upload
+### Description
+Enable users to upload a CSV of URLs to shorten, and return a CSV of shortened URLs.
+
+### Usage
+Users can upload a CSV file containing a list of URLs. The system processes each URL and provides a downloadable CSV with the shortened URLs.
+
+### Validation
+- **Correctness**: Test various CSV formats and ensure successful URL shortening and accurate return of results.
+- **Scalability**: Ensure that the system can process CSV files containing thousands of URLs efficiently. This could involve implementing chunked processing or background jobs to prevent the system from being blocked by large uploads.
+- **Professionalism**: Ensure code readability and include tests for different CSV edge cases, like empty rows or invalid URLs.
+
+## 7. Redirection Limits
+### Description
+Set limits on redirections, such as a maximum number of redirects over a set time or concurrent redirects for a URL or domain.
+
+### Usage
+This feature is configured by the administrator to set redirection limits on URLs or domains. Limits prevent excessive redirects in a short period and can be monitored through system logs.
+
+### Validation
+- **Correctness**: Implement test cases to confirm that redirection limits are triggered and respected.
+- **Scalability**: Simulate heavy redirection traffic to verify that limit enforcement remains consistent. Explore distributed data stores or sharded databases to manage redirection counters in large-scale systems.
+- **Professionalism**: Provide documentation explaining the redirection limits and ensure the logic is well-structured, with clear test cases for edge cases and abuse prevention.

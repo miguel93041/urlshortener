@@ -1,3 +1,4 @@
+@file:Suppress("WildcardImport")
 package es.unizar.urlshortener.infrastructure.delivery
 
 import es.unizar.urlshortener.core.ClickProperties
@@ -64,6 +65,7 @@ data class ShortUrlDataOut(
  *
  * **Note**: Spring Boot is able to discover this [RestController] without further configuration.
  */
+@Suppress("LongParameterList")
 @RestController
 class UrlShortenerControllerImpl(
     val redirectUseCase: RedirectUseCase,
@@ -105,11 +107,9 @@ class UrlShortenerControllerImpl(
             ResponseEntity<Unit>(h, HttpStatus.valueOf(mode))
         }
     }
+
     @PostMapping("/api/upload-csv", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun shortenUrlsFromCsv(
-        @RequestParam("file") file: MultipartFile,
-        request: HttpServletRequest
-    ): ResponseEntity<ByteArrayResource> {
+    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile): ResponseEntity<ByteArrayResource> {
         val reader = InputStreamReader(file.inputStream.buffered())
         val csvResult = processCsvUseCase.processCsv(reader, createShortUrlUseCase)
 
@@ -156,9 +156,13 @@ class UrlShortenerControllerImpl(
                 properties = mapOf(
                     "safe" to properties.safe,
                 ),
-                qrCode = qrUseCase.create(url.toString(), 256)
+                qrCode = qrUseCase.create(url.toString(), QR_SIZE)
             )
             ResponseEntity<ShortUrlDataOut>(response, h, HttpStatus.CREATED)
         }
+    }
+
+    companion object {
+        const val QR_SIZE = 256
     }
 }

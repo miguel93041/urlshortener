@@ -1,3 +1,4 @@
+@file:Suppress("WildcardImport")
 package es.unizar.urlshortener
 
 import com.google.zxing.qrcode.QRCodeWriter
@@ -10,6 +11,7 @@ import es.unizar.urlshortener.infrastructure.repositories.ClickRepositoryService
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlEntityRepository
 import es.unizar.urlshortener.infrastructure.repositories.ShortUrlRepositoryServiceImpl
 import es.unizar.urlshortener.thirdparties.ipinfo.GeoLocationServiceImpl
+import io.github.cdimascio.dotenv.Dotenv
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,6 +24,7 @@ import java.io.ByteArrayOutputStream
  *
  * **Note**: Spring Boot is able to discover this [Configuration] without further configuration.
  */
+@Suppress("TooManyFunctions")
 @Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
@@ -81,21 +84,15 @@ class ApplicationConfiguration(
     @Bean
     fun qrCodeWriter(): QRCodeWriter = QRCodeWriter()
 
-    @Bean
-    fun byteArrayOutputStream(): ByteArrayOutputStream = ByteArrayOutputStream()
-
     /**
      * Provides an implementation of the LogClickUseCase.
      * @return an instance of LogClickUseCaseImpl.
      */
     @Bean
-    fun createQRUseCase(
-        qrCodeWriter: QRCodeWriter,
-        byteArrayOutputStream: ByteArrayOutputStream
-    ) = CreateQRUseCaseImpl(qrCodeWriter, byteArrayOutputStream)
+    fun createQRUseCase(qrCodeWriter: QRCodeWriter) = CreateQRUseCaseImpl(qrCodeWriter)
 
     @Bean
-    fun ProcessCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")
+    fun processCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")
 
     @Bean
     fun redirectionCountRepository(): RedirectionCountRepository {
@@ -111,8 +108,11 @@ class ApplicationConfiguration(
     fun webClient(): WebClient = WebClient.builder().build()
 
     @Bean
-    fun geoLocationService(webClient: WebClient): GeoLocationService {
-        return GeoLocationServiceImpl(webClient)
+    fun dotEnv(): Dotenv = Dotenv.load()
+
+    @Bean
+    fun geoLocationService(webClient: WebClient, dotEnv: Dotenv): GeoLocationService {
+        return GeoLocationServiceImpl(webClient, dotEnv)
     }
 
     @Bean

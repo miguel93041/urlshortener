@@ -30,6 +30,8 @@ dependencies {
     implementation("com.google.zxing:core:3.5.2")
     implementation("com.google.zxing:javase:3.5.2")
 
+    implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
+
     // Adds HSQLDB as a runtime-only dependency.
     runtimeOnly(libs.hsqldb)
     // Adds Kotlin reflection library as a runtime-only dependency.

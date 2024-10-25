@@ -8,6 +8,7 @@ interface ProcessCsvUseCase {
     fun processCsv(reader: InputStreamReader, createShortUrlUseCase: CreateShortUrlUseCase): String
 }
 
+@Suppress("TooGenericExceptionCaught")
 class ProcessCsvUseCaseImpl (
     val baseUrl: String // por ejemplo: "http://localhost:8080"
 ) : ProcessCsvUseCase {

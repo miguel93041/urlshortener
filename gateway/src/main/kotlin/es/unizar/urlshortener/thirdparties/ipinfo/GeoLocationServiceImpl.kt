@@ -18,9 +18,7 @@ class GeoLocationServiceImpl(
     dotenv: Dotenv
 ) : GeoLocationService {
 
-    private val accessToken = System.getenv(DOTENV_IPINFO_KEY) ?: dotenv[DOTENV_IPINFO_KEY].also {
-        require(!it.isNullOrEmpty()) { "IPINFO_API_KEY is not set or is empty" }
-    }
+    private val accessToken = System.getenv(DOTENV_IPINFO_KEY) ?: dotenv[DOTENV_IPINFO_KEY]
 
     /**
      * Retrieves geographical information for the specified IP address.

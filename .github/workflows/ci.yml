@@ -31,12 +31,17 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew test --no-daemon
 
-      - name: Upload test report
+      - name: Upload test reports
         if: failure() || always()
         uses: actions/upload-artifact@v3
         with:
-          name: test-report
-          path: app/build/reports/tests/test
+          name: test-reports
+          path: |
+            app/build/reports/tests/test
+            core/build/reports/tests/test
+            delivery/build/reports/tests/test
+            gateway/build/reports/tests/test
+            repositories/build/reports/tests/test
 
       - name: Cleanup Gradle Cache
         run: |

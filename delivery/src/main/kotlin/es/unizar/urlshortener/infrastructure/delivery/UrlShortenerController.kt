@@ -144,13 +144,12 @@ class UrlShortenerControllerImpl(
             return ResponseEntity(ShortUrlDataOut(), HttpStatus.BAD_REQUEST)
         }
 
-        val geoLocation = geoLocationService.get(request.remoteAddr)
-
-        val isSafe = urlValidationService.isSafe(data.url)
-
-        if (!isSafe) {
+        if (!urlValidationService.isSafe(data.url)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ShortUrlDataOut())
         }
+
+        val geoLocation = geoLocationService.get(request.remoteAddr)
+
         return createShortUrlUseCase.create(
             url = data.url,
             data = ShortUrlProperties(

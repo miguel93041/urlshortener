@@ -107,9 +107,15 @@ class ApplicationConfiguration(
         createShortUrlUseCase: CreateShortUrlUseCase,
         baseUrlProvider: BaseUrlProvider,
         geoLocationService: GeoLocationService,
-        urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase
+        urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase,
+        urlSafetyService: UrlSafetyService
     ): ProcessCsvUseCase {
-        return ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider, geoLocationService, urlAccessibilityCheckUseCase)
+        return ProcessCsvUseCaseImpl(createShortUrlUseCase,
+            baseUrlProvider,
+            geoLocationService,
+            urlAccessibilityCheckUseCase,
+            urlSafetyService,
+        )
     }
 
     /**

@@ -136,7 +136,11 @@ class ApplicationConfiguration(
      * @return an instance of DotEnv.
      */
     @Bean
-    fun dotEnv(): Dotenv = Dotenv.load()
+    fun dotEnv(): Dotenv {
+        return Dotenv.configure()
+            .ignoreIfMissing()
+            .load()
+    }
 
     /**
      * Provides an implementation of the GeoLocationService.

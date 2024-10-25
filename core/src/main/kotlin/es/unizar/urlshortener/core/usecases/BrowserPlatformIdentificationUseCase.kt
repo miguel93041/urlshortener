@@ -20,7 +20,9 @@ interface BrowserPlatformIdentificationUseCase {
 /**
  * Implementation of [BrowserPlatformIdentificationUseCase].
  */
-class BrowserPlatformIdentificationUseCaseImpl : BrowserPlatformIdentificationUseCase {
+class BrowserPlatformIdentificationUseCaseImpl(
+    private val parser: Parser
+) : BrowserPlatformIdentificationUseCase {
     /**
      * Parse the user agent header used during redirection requests.
      *
@@ -29,11 +31,14 @@ class BrowserPlatformIdentificationUseCaseImpl : BrowserPlatformIdentificationUs
      * @throws InvalidUrlException if the URL is not valid.
      */
     override fun parse(userAgent: String): BrowserPlatform {
-        val parser = Parser()
+        if (userAgent.isBlank()) {
+            throw InvalidUrlException("User-Agent header is invalid")
+        }
+
         val client = parser.parse(userAgent)
 
-        val browser = "${client.userAgent.family}"
-        val platform = client.os.family
+        val browser = client.userAgent.family ?: "Unknown Browser"
+        val platform = client.os.family ?: "Unknown Platform"
 
         return BrowserPlatform(browser, platform)
     }

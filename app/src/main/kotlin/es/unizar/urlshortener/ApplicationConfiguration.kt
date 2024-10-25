@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
+import ua_parser.Parser
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
@@ -89,6 +90,7 @@ class ApplicationConfiguration(
     fun redirectionCountRepository(): RedirectionCountRepository {
         return InMemoryRedirectionCountRepository()
     }
+
     @Bean
     fun redirectionLimitUseCase(redirectionCountRepository: RedirectionCountRepository): RedirectionLimitUseCase {
         return RedirectionLimitUseCaseImpl(redirectionLimit = 10, redirectionCountRepository)
@@ -103,5 +105,9 @@ class ApplicationConfiguration(
     }
 
     @Bean
-    fun browserPlatformIdentificationUseCase() = BrowserPlatformIdentificationUseCaseImpl()
+    fun uaParser(): Parser = Parser()
+
+    @Bean
+    fun browserPlatformIdentificationUseCase(uaParser: Parser): BrowserPlatformIdentificationUseCase =
+        BrowserPlatformIdentificationUseCaseImpl(uaParser)
 }

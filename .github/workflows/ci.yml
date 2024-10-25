@@ -31,6 +31,13 @@ jobs:
           IPINFO_API_KEY: ${{ secrets.IPINFO_API_KEY }}
         run: ./gradlew test --no-daemon
 
+      - name: Upload test report
+        if: failure() || always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: app/build/reports/tests/test
+
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock

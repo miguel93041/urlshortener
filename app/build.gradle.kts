@@ -29,7 +29,6 @@ dependencies {
     implementation("com.github.ua-parser:uap-java:1.6.1")
     implementation("com.google.zxing:core:3.5.2")
     implementation("com.google.zxing:javase:3.5.2")
-
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
 
     // Adds HSQLDB as a runtime-only dependency.

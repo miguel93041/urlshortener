@@ -64,6 +64,10 @@ interface HashService {
     fun hasUrl(url: String): String
 }
 
+/**
+ * [GeoLocationService] defines the contract for a service that retrieves geographical
+ * information based on an IP address.
+ */
 interface GeoLocationService {
     fun get(ip: String): GeoLocation
 }

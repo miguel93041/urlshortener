@@ -2,6 +2,8 @@
 package es.unizar.urlshortener
 
 import com.google.zxing.qrcode.QRCodeWriter
+import es.unizar.urlshortener.core.BaseUrlProvider
+import es.unizar.urlshortener.core.BaseUrlProviderImpl
 import es.unizar.urlshortener.core.GeoLocationService
 import es.unizar.urlshortener.core.UrlValidationService
 import es.unizar.urlshortener.core.usecases.*
@@ -19,7 +21,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 import ua_parser.Parser
-import java.io.ByteArrayOutputStream
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
@@ -83,40 +84,79 @@ class ApplicationConfiguration(
     fun createShortUrlUseCase() =
         CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
 
+    /**
+     * Provides a QRCodeWriter.
+     * @return an instance of QRCodeWriter.
+     */
     @Bean
     fun qrCodeWriter(): QRCodeWriter = QRCodeWriter()
 
     /**
-     * Provides an implementation of the LogClickUseCase.
-     * @return an instance of LogClickUseCaseImpl.
+     * Provides an implementation of the CreateQRUseCase.
+     * @return an instance of CreateQRUseCaseImpl.
      */
     @Bean
     fun createQRUseCase(qrCodeWriter: QRCodeWriter) = CreateQRUseCaseImpl(qrCodeWriter)
 
+    /**
+     * Provides an implementation of the ProcessCsvUseCase.
+     * @return an instance of ProcessCsvUseCaseImpl.
+     */
     @Bean
-    fun processCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")
+    fun processCsvUseCase(createShortUrlUseCase: CreateShortUrlUseCase,
+                          baseUrlProvider: BaseUrlProvider): ProcessCsvUseCase {
+        return ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider)
+    }
 
+    /**
+     * Provides a RedirectionCountRepository.
+     * @return an instance of InMemoryRedirectionCountRepository.
+     */
     @Bean
     fun redirectionCountRepository(): RedirectionCountRepository {
         return InMemoryRedirectionCountRepository()
     }
 
+    /**
+     * Provides an implementation of the RedirectionLimitUseCase.
+     * @return an instance of RedirectionLimitUseCaseImpl.
+     */
     @Bean
     fun redirectionLimitUseCase(redirectionCountRepository: RedirectionCountRepository): RedirectionLimitUseCase {
         return RedirectionLimitUseCaseImpl(redirectionLimit = 10, redirectionCountRepository)
     }
 
+    /**
+     * Provides a WebClient.
+     * @return an instance of WebClient.
+     */
     @Bean
     fun webClient(): WebClient = WebClient.builder().build()
 
+    /**
+     * Provides a DotEnv.
+     * @return an instance of DotEnv.
+     */
     @Bean
-    fun dotEnv(): Dotenv = Dotenv.load()
+    fun dotEnv(): Dotenv {
+        return Dotenv.configure()
+            .ignoreIfMissing()
+            .load()
+    }
 
+    /**
+     * Provides an implementation of the GeoLocationService.
+     * @return an instance of GeoLocationServiceImpl.
+     */
     @Bean
     fun geoLocationService(webClient: WebClient, dotEnv: Dotenv): GeoLocationService {
         return GeoLocationServiceImpl(webClient, dotEnv)
     }
 
+    /**
+     * Provides a Parser.
+     * @return an instance of Parser.
+     */
     @Bean
     fun urlSafetyService(webClient: WebClient, dotEnv: Dotenv): UrlValidationService {
         return UrlSafetyServiceImpl(webClient, dotEnv)
@@ -125,7 +165,22 @@ class ApplicationConfiguration(
     @Bean
     fun uaParser(): Parser = Parser()
 
+    /**
+     * Provides an implementation of the BrowserPlatformIdentificationUseCase.
+     * @return an instance of BrowserPlatformIdentificationUseCaseImpl.
+     */
     @Bean
     fun browserPlatformIdentificationUseCase(uaParser: Parser): BrowserPlatformIdentificationUseCase =
         BrowserPlatformIdentificationUseCaseImpl(uaParser)
+
+    /**
+     * Provides an implementation of the UrlAccessibilityCheckUseCase.
+     * @return an instance of UrlAccessibilityCheckUseCaseImpl.
+     */
+    @Bean
+    fun urlAccesibilityCheckUseCase(webClient: WebClient): UrlAccessibilityCheckUseCase =
+        UrlAccessibilityCheckUseCaseImpl(webClient)
+
+    @Bean
+    fun baseUrlProvider(): BaseUrlProvider = BaseUrlProviderImpl()
 }

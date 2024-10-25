@@ -53,11 +53,17 @@ data class ClickProperties(
     val country: String? = null
 )
 
+/**
+ * A [GeoLocation] represents the geographical information associated with an IP address.
+ */
 data class GeoLocation(
     val ip: String,
     val country: String
 )
 
+/**
+ * A [BrowserPlatform] represents information about the user's browser and platform.
+ */
 data class BrowserPlatform(
     val browser: String,
     val platform: String

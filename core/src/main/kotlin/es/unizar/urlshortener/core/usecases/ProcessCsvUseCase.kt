@@ -2,7 +2,9 @@
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.BaseUrlProvider
+import es.unizar.urlshortener.core.GeoLocationService
 import es.unizar.urlshortener.core.ShortUrlProperties
+import jakarta.servlet.http.HttpServletRequest
 import java.io.*
 
 /**
@@ -22,7 +24,7 @@ interface ProcessCsvUseCase {
      * @param reader The source of CSV data containing URLs.
      * @param writer The destination to write the results of URL shortening or error messages.
      */
-    fun processCsv(reader: Reader, writer: Writer)
+    fun processCsv(reader: Reader, writer: Writer, request: HttpServletRequest)
 }
 
 /**
@@ -36,7 +38,9 @@ interface ProcessCsvUseCase {
 @Suppress("TooGenericExceptionCaught")
 class ProcessCsvUseCaseImpl (
     private val createShortUrlUseCase: CreateShortUrlUseCase,
-    private val baseUrlProvider: BaseUrlProvider
+    private val baseUrlProvider: BaseUrlProvider,
+    private val geoLocationService: GeoLocationService,
+    private val urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase
 ) : ProcessCsvUseCase {
 
     /**
@@ -49,16 +53,24 @@ class ProcessCsvUseCaseImpl (
      * @param reader The source of CSV data containing URLs.
      * @param writer The destination to write the results of URL shortening or error messages.
      */
-    override fun processCsv(reader: Reader, writer: Writer) {
+    override fun processCsv(reader: Reader, writer: Writer, request: HttpServletRequest) {
+        val geoLocation = geoLocationService.get(request.remoteAddr)
         writer.append("original-url,shortened-url\n")
 
         BufferedReader(reader).use { br ->
             br.forEachLine { line ->
                 val originalUrl = line.trim()
                 try {
-                    val shortUrl = createShortUrlUseCase.create(originalUrl, ShortUrlProperties())
-                    val shortenedUrl = buildShortenedUrl(shortUrl.hash)
-                    writer.append("$originalUrl,$shortenedUrl\n")
+                    if (!urlAccessibilityCheckUseCase.isUrlReachable(originalUrl)) {
+                        writer.append("$originalUrl,ERROR: Not reachable\n")
+                    } else {
+                        val shortUrl = createShortUrlUseCase.create(originalUrl, ShortUrlProperties(
+                            ip = geoLocation.ip,
+                            country = geoLocation.country
+                        ))
+                        val shortenedUrl = buildShortenedUrl(shortUrl.hash)
+                        writer.append("$originalUrl,$shortenedUrl\n")
+                    }
                 } catch (e: Exception) {
                     writer.append("$originalUrl,ERROR: ${e.message}\n")
                 }

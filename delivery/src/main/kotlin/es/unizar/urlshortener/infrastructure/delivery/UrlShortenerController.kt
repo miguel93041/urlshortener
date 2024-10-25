@@ -92,7 +92,6 @@ class UrlShortenerControllerImpl(
      */
     @GetMapping("/{id:(?!api|index|favicon\\.ico).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
-        // Verifica si se ha alcanzado el límite de redirecciones
         if (redirectionLimitUseCase.isRedirectionLimit(id)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build()
         }
@@ -113,12 +112,12 @@ class UrlShortenerControllerImpl(
     }
 
     @PostMapping("/api/upload-csv", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile): ResponseEntity<StreamingResponseBody> {
+    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile, request: HttpServletRequest): ResponseEntity<StreamingResponseBody> {
         val reader = InputStreamReader(file.inputStream.buffered())
 
         val responseBody = StreamingResponseBody { outputStream ->
             BufferedWriter(OutputStreamWriter(outputStream)).use { writer ->
-                processCsvUseCase.processCsv(reader, writer)
+                processCsvUseCase.processCsv(reader, writer, request)
             }
         }
 

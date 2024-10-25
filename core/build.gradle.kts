@@ -19,6 +19,7 @@ dependencies {
     implementation ("org.apache.commons:commons-csv:1.9.0")
 
     implementation("com.github.ua-parser:uap-java:1.6.1")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 

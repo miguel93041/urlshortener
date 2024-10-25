@@ -21,7 +21,11 @@ import java.net.URI
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.core.io.ByteArrayResource
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
+import java.io.BufferedWriter
 import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.io.StringWriter
 
 /**
  * The specification of the controller.
@@ -109,20 +113,23 @@ class UrlShortenerControllerImpl(
     }
 
     @PostMapping("/api/upload-csv", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile): ResponseEntity<ByteArrayResource> {
+    fun shortenUrlsFromCsv(@RequestParam("file") file: MultipartFile): ResponseEntity<StreamingResponseBody> {
         val reader = InputStreamReader(file.inputStream.buffered())
-        val csvResult = processCsvUseCase.processCsv(reader, createShortUrlUseCase)
 
-        val resource = ByteArrayResource(csvResult.toByteArray())
+        val responseBody = StreamingResponseBody { outputStream ->
+            BufferedWriter(OutputStreamWriter(outputStream)).use { writer ->
+                processCsvUseCase.processCsv(reader, writer)
+            }
+        }
+
         val headers = HttpHeaders().apply {
             add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=shortened_urls.csv")
+            contentType = MediaType.parseMediaType("text/csv")
         }
 
         return ResponseEntity.ok()
             .headers(headers)
-            .contentLength(resource.contentLength())
-            .contentType(MediaType.parseMediaType("text/csv"))
-            .body(resource)
+            .body(responseBody)
     }
 
     /**

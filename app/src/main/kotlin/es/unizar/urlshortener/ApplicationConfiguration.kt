@@ -2,6 +2,8 @@
 package es.unizar.urlshortener
 
 import com.google.zxing.qrcode.QRCodeWriter
+import es.unizar.urlshortener.core.BaseUrlProvider
+import es.unizar.urlshortener.core.BaseUrlProviderImpl
 import es.unizar.urlshortener.core.GeoLocationService
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
@@ -99,7 +101,10 @@ class ApplicationConfiguration(
      * @return an instance of ProcessCsvUseCaseImpl.
      */
     @Bean
-    fun processCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")
+    fun processCsvUseCase(createShortUrlUseCase: CreateShortUrlUseCase,
+                          baseUrlProvider: BaseUrlProvider): ProcessCsvUseCase {
+        return ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider)
+    }
 
     /**
      * Provides a RedirectionCountRepository.
@@ -164,4 +169,7 @@ class ApplicationConfiguration(
     @Bean
     fun urlAccesibilityCheckUseCase(webClient: WebClient): UrlAccessibilityCheckUseCase =
         UrlAccessibilityCheckUseCaseImpl(webClient)
+
+    @Bean
+    fun baseUrlProvider(): BaseUrlProvider = BaseUrlProviderImpl()
 }

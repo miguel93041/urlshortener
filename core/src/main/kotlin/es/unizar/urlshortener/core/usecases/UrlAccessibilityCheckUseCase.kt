@@ -32,7 +32,7 @@ class UrlAccessibilityCheckUseCaseImpl(
             webClient.get()
                 .uri(url)
                 .retrieve()
-                .bodyToMono(Map::class.java)
+                .toBodilessEntity()
                 .block()
 
             true

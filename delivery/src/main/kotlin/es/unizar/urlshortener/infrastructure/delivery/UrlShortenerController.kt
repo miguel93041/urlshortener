@@ -135,7 +135,7 @@ class UrlShortenerControllerImpl(
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> {
         if (!urlAccessibilityCheckUseCase.isUrlReachable(data.url)) {
-            ResponseEntity<ShortUrlDataOut>(ShortUrlDataOut(), HttpStatus.BAD_REQUEST)
+            return ResponseEntity(ShortUrlDataOut(), HttpStatus.BAD_REQUEST)
         }
 
         val geoLocation = geoLocationService.get(request.remoteAddr)

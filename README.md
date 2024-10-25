@@ -1,6 +1,6 @@
-# Getting Started with the URL Shortener project
+# ElectricURL Shortener project
 
-2024-08-31
+2024-10-26
 
 ## System requirements
 
@@ -41,51 +41,12 @@ architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-archite
   stored in relational databases.
 - A `repositories` module that knows how to store domain entities in a
   relational database.
+- A `gateway` module that knows how to call third APIs.
 - A `delivery` module that knows how to expose the functionalities on
   the web.
 - An `app` module that contains the main application, the configuration
   (i.e., it links `core`, `delivery`, and `repositories`), and the
   static assets (i.e., HTML files, JavaScript files, etc.).
-
-```mermaid
-flowchart LR;
-    User-- HTTP -->Tomcat("Embedded<br>Web Server<br><b>Apache Tomcat")
-    subgraph "Application <b>UrlShortener</b>"
-        Tomcat== "Dynamic<br>resources" ==>Delivery("Module<br><b>delivery</b>")
-        Tomcat== "Static<br>resources" ==>App("Module<br><b>app</b>")
-        Tomcat~~~App("Module<br><b>app</b>")
-        App-. configure .->Tomcat
-        App-. configure .->Delivery
-        App-. configure .->Core
-        App-. configure .->Repositories
-        subgraph Core [Module<br><b>core</b>]
-            PortA("Port")==>UseCases("Use<br>Cases")
-            UseCases==>PortB("Port")
-        end
-        PortB==>Repositories("Module<br><b>repositories</b>")
-        Delivery==>PortA
-    end
-    Repositories-- JDBC -->Database[(Database)]
-```
-
-Usually, if you plan to add a new feature:
-
-- You will add a new use case to the `core` module.
-- If required, you will modify the persistence model in the
-  `repositories` module.
-- You will implement a web-oriented solution to expose it to clients in
-  the `delivery` module.
-
-Sometimes, your feature will not be as simple, and it may require:
-
-- Connecting to a third party (e.g., an external server). In this case,
-  you will add a new module named `gateway` responsible for such a task.
-- An additional application. In this case, you can create a new
-  application module (e.g., `app2`) with the appropriate configuration
-  to run this second server.
-
-Features that require connecting to a third party or having more than a
-single app will be rewarded.
 
 ## Run
 
@@ -150,19 +111,26 @@ The uberjar can be built and then run with:
 java -jar app/build/libs/app-0.2024.1-SNAPSHOT.jar
 ```
 
+A Google Safe Browsing and IPInfo key must be put in a .env file in app module like this (or env variables):
+```
+IPINFO_API_KEY=3400c66...
+GOOGLE_API_KEY=AIzaSyAQAo1i4...
+```
+
 ## Functionalities
 
-The project offers a minimum set of functionalities:
+The project offers a set of functionalities:
 
-- **Create a short URL**. See in `core` the use case
-  `CreateShortUrlUseCase` and in `delivery` the REST controller
-  `UrlShortenerController`.
-
-- **Redirect to a URL**. See in `core` the use case `RedirectUseCase`
-  and in `delivery` the REST controller `UrlShortenerController`.
-
-- **Log redirects**. See in `core` the use case `LogClickUseCase` and in
-  `delivery` the REST controller `UrlShortenerController`.
+- **Create a short URL**. See in `core` the use case `CreateShortUrlUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+- **Redirect to a URL**. See in `core` the use case `RedirectUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+- **Log redirects**. See in `core` the use case `LogClickUseCase` and in `delivery` the REST controller `UrlShortenerController`.
+- **Generate a QR Code for shortened URLs**. A QR code is shown in the frontend containing the shortened URL.
+- **Analyze browser and platform**. HTTP headers are parsed and user browser and platform are identified during redirection.
+- **Geolocation service**. Geographical location of users is collected based on their IP addresses.
+- **Check URL accessibility**. URL is checked for reachability before shortening.
+- **Google Safe Browsing Check**. URLs are checked for safety before shortening them.
+- **CSV Upload for Bulk URL Shortening**. Allows users to upload a CSV file containing URLs and download a new CSV with the shortened URLs.
+- **Redirection Limits**. Imposes a limit of 10 redirections per URL, preventing further redirects once the limit is reached.
 
 The objects in the domain are:
 
@@ -171,12 +139,15 @@ The objects in the domain are:
 - `ShortUrlProperties`: a handy way to extend data about a short URL
 - `Click`: the minimum data captured when a redirection is logged
 - `ClickProperties`: a handy way to extend data about a click
+- `GeoLocation`: IP address and its country
+- `BrowserPlatform`: user`s browser and platform
 
 ## Delivery
 
 The above functionality is available through a simple API:
 
 - `POST /api/link` which creates a short URL from data send by a form.
+- `POST /api/upload-csv` for bulk processing of URLs through CSV uploads.
 - `GET /{id}` where `{id}` identifies the short URL, deals with
   redirects, and logs use (i.e. clicks).
 
@@ -217,61 +188,69 @@ The following guides illustrate how to use some features concretely:
 - [Accessing Data with
   JPA](https://spring.io/guides/gs/accessing-data-jpa/)
 
-# Project Report ElectricURL
+# First Project Report
 ## QR Code Generation
 ### Description
 Generate a QR code for any shortened URL, offering an alternative access method.
 ### Libraries
-We have used zxing.qrcode that has allowed us to generate a QR from a URL. ZXing (Zebra Crossing) is an open-source library for encoding and decoding various barcode formats, including QR codes. The zxing.qrcode module specifically allows for the generation and reading of QR codes, making it easy to convert text or URLs into QR codes and vice versa.
+We utilized the zxing.qrcode library for this feature. ZXing (Zebra Crossing) is an open-source library widely used for both encoding and decoding barcode formats, including QR codes. The zxing.qrcode module specifically simplifies generating and reading QR codes, which can convert text or URLs into QR code images and also decode existing QR codes. This makes it highly effective for use in URL shortening services, where generating a QR code is often required.
 ### How to run the PoC
-When you write a URL in the input field and click on the shorten button, the QR is automatically generated below the shortened url.
+When a user inputs a URL and clicks the "Shorten" button, the shortened URL appears along with the automatically generated QR code directly beneath it. This QR code is instantly usable without any additional steps.
 ### Tests
-We have implemented 3 tests: the first one tests that with a valid shortened URL and a valid size a QR is generated.
-The second one tests that with an invalid URL (for example an empty one) the create function throws an exception.
-The last one is similar to the second one but with a null shortened URL.
+Three key tests have been implemented for this feature:
+1. Valid URL and Size Test: Verifies that when a valid URL and size are provided, the QR code is correctly generated.
+2. Invalid URL Test: Confirms that if an invalid URL (e.g., empty string) is provided, the QR code generation throws an exception.
+3. Null URL Test: Similar to the invalid URL test, but checks that when a null URL is passed, an exception is also thrown.
 
 ## Browser and Platform Identification
 ### Description
 Analyze HTTP headers to identify the browser (e.g., Chrome, Firefox) and platform (e.g., Windows, macOS, Linux) used during redirection requests.
 ### Libraries
-We have used ua-parser library to parser the User-Agent header from the requests and obtain the browser and the platform.
-It is a JavaScript library to detect Browser, Engine, OS, CPU, and Device type/model from User-Agent data with relatively small footprint (~17KB minified, ~6KB gzipped) that can be used either in browser (client-side) or node.js (server-side).
+We utilized the ua-parser library, a lightweight JavaScript tool that parses the User-Agent string in HTTP headers to identify the browser, operating system, and device type. It works on both client-side (in-browser) and server-side (Node.js), making it versatile for cross-platform use.
 ### How to run the PoC
-When you click on the shortened URL generated, the user-agent header is parsed to obtain the browser and the platform and these values are put in the ClickProperties when the click is going to be saved.
+When a user clicks a shortened URL, the system extracts and parses the User-Agent string from the request headers. The parsed browser and platform information are then stored in the ClickProperties object during the click event logging process.
 ### Tests
-We have implemented 3 tests: the first one tests that with a valid user agent are the corresponding ones.
-The second one tests that with an invalid user agent (for example an empty one) the parse function throws an exception. 
-The last one tests that if the parse function returns null values the browser and the platform are the default values.
+Three tests ensure the functionality of this feature:
+1. Valid User-Agent Test: Ensures that valid User-Agent strings are correctly parsed into browser and platform information.
+2. Invalid User-Agent Test: Checks that when an invalid or empty User-Agent string is provided, an exception is thrown.
+3. Null Return Value Test: Verifies that if the parsing function returns null, default values for the browser and platform are used.
 
 ## Geolocation Service
 ### Description
 Provide the client’s geographical location based on their IP address. This is useful for tracking both the user requesting a redirection and the user who clicked the shortened URL.
 ### API
-We have used the IPInfo API which is free and popular and given an ip it makes http queries and has allowed us to obtain the country from where they are made. It is a tool that allows you to obtain geolocated information from an IP address.
+We integrated the IPInfo API to retrieve geolocation information based on the user's IP address. This API performs HTTP requests and returns the country and other geolocated details of the given IP address.
 ### How to run the PoC
-Both when a get and a post are performed, the remoteAddr is obtained, from which the ip and the country are obtained and these values are put in the ClickProperties when the click is going to be saved or when the ShortUrlProperties ar going to be created.
+During both GET and POST requests, the remote IP address is extracted from the client request. The IP address is then used to query the IPInfo API, which returns the associated country. This information is stored in the ClickProperties for the click events or ShortUrlProperties when the short URL is created.
 ### Tests
-We have implemented 3 tests: the first one tests that when API returns a valid response, we can obtain the ip and the country.
-The second one tests that when it returns a bogon country (private network), it returns bogon as the country.
-The last one tests that when API returns an errror, an exception is thrown.
+Three tests ensure the reliability of the geolocation service:
+1. Valid API Response Test: Ensures that when the API returns valid data, both the IP address and country are correctly retrieved.
+2. Bogon IP Test: Confirms that when the API returns a bogon (private network) IP, the service returns "bogon" as the country.
+3. API Error Handling Test: Ensures that when the API returns an error, an exception is thrown.
 
 ## URL Accessibility Check
 ### Description
 Ensure that a URL is reachable before allowing it to be shortened.
 ### Libraries
-We have used WebClient, which has allowed us to make get requests and obtain their response.
-It is a non-blocking, reactive HTTP client in Spring that allows you to perform asynchronous requests to external web services, APIs, or servers. It supports handling various HTTP methods, processing responses, and managing errors efficiently.
+We used WebClient, a non-blocking, reactive HTTP client provided by Spring for handling HTTP requests. It allows us to asynchronously perform GET requests to check the reachability of URLs. The client efficiently handles errors and supports multiple HTTP methods, making it ideal for URL validation.
 ### How to run the PoC
-Before an url is shortened, it is checked by a get request to see if it is reachable. If it is not, it returns an error and is not shortened.
+Before a URL is shortened, a GET request is made to verify its accessibility. If the URL is unreachable, an error message is displayed, and the URL is not processed for shortening.
 ### Tests
-We have implemented 2 tests: one for when the URL is reachable and another one for when the URL is not reachable and then throws and exception.
+Two tests validate the functionality:
+1. Reachable URL Test: Ensures that when a URL is reachable, it is successfully processed.
+2. Unreachable URL Test: Verifies that when a URL is not reachable, an exception is thrown, and the URL is not shortened.
 
 ## Google Safe Browsing Check
 ### Description
 Validate the safety of a URL using the Google Safe Browsing API, ensuring users are not redirected to malicious sites.
-### Libraries
+### API
+We have used the Google Safe Browsing API which is free of charge. Given an url it returns if it's safe or not.
 ### How to run the PoC
+Before an url is shortened, it is checked against Google Safe Browsing API. If it is dangerous, it returns an error and is not shortened.
 ### Tests
+Two tests validate the functionality:
+1. Malicius URL
+2. Safe URL
 
 ## CSV Upload
 ### Description
@@ -279,10 +258,13 @@ Enable users to upload a CSV of URLs to shorten, and return a CSV of shortened U
 ### Libraries
 None
 ### How to run the PoC
-You have to click on the button on the left of the input field that has a paper clip icon and attach a .csv file. As a result, a .csv file will be automatically downloaded with both the original urls and the shortened urls.
+Users can upload a CSV file by clicking the paper clip icon next to the URL input field. Once uploaded, the system processes the URLs, shortens them, and downloads a new CSV file containing both the original and shortened URLs.
 ### Tests
-We have implemented 4 tests: the first one tests that a valid URL is processed correctly. The second one that when a URL is invalid it is thrown an exception. 
-The third one that nothing is processed with an empty URL and the last one that with several URLs are processed correctly.
+Four tests have been implemented:
+1. Valid URL Test: Ensures that valid URLs in the CSV are processed and shortened correctly.
+2. Invalid URL Test: Verifies that an exception is thrown when an invalid URL is encountered.
+3. Empty URL Test: Confirms that no processing occurs if an empty URL is provided.
+4. Multiple URLs Test: Tests that the system correctly processes multiple URLs in a single CSV file.
 
 ## Redirection Limits
 ### Description
@@ -290,6 +272,18 @@ Set limits on redirections, such as a maximum number of redirects over a set tim
 ### Libraries
 None
 ### How to run the PoC
-The redirection limit is 10. If you click 10 times the same shortened URL, an error will show.
+A limit of 10 redirections per URL has been set. Once a user clicks the same shortened URL 10 times, an error message is displayed, and further redirects are blocked.
 ### Tests
-We have only one test that checks that it is correctly recognized when reaching a specific redirect limit (3).
+Only one test has been implemented:
+1. Redirect Limit Test: Verifies that the system correctly enforces the limit after 3 redirections, simulating a lower threshold to confirm the functionality.
+
+# Issues Found
+
+1. **GitHub Actions does not properly send SECRETS, causing them not to be injected into tests**  
+   During the CI/CD process, GitHub Actions encountered issues where environment secrets were not being passed correctly to the test suite. This resulted in sensitive configuration variables not being available during the testing phase, leading to test failures and incomplete validation of the code.
+
+2. **The core module had `bootJar`, which is incorrect since it should be a library**  
+   The core module was configured to use `bootJar`, which is intended for applications rather than libraries. As this module is a library, the appropriate configuration would be to use `jar` instead, ensuring the module is packaged correctly for its intended purpose.
+
+3. **Integration tests failed in the GitHub Actions workflow**  
+   The integration tests within the GitHub Actions workflow consistently failed. This issue suggests potential misconfigurations or environment mismatches between local and CI environments, or problems with dependency management during the testing phase. This failure impacted the overall CI process, preventing successful builds and deployments.

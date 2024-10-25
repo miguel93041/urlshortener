@@ -222,6 +222,7 @@ The following guides illustrate how to use some features concretely:
 ### Description
 Generate a QR code for any shortened URL, offering an alternative access method.
 ### Libraries
+We have used zxing.qrcode that has allowed us to generate a QR from a URL. ZXing (Zebra Crossing) is an open-source library for encoding and decoding various barcode formats, including QR codes. The zxing.qrcode module specifically allows for the generation and reading of QR codes, making it easy to convert text or URLs into QR codes and vice versa.
 ### How to run the PoC
 When you write a URL in the input field and click on the shorten button, the QR is automatically generated below the shortened url.
 ### Tests
@@ -245,29 +246,30 @@ The last one tests that if the parse function returns null values the browser an
 ## Geolocation Service
 ### Description
 Provide the client’s geographical location based on their IP address. This is useful for tracking both the user requesting a redirection and the user who clicked the shortened URL.
-### Libraries
-### Challenges
+### API
+We have used the IPInfo API which is free and popular and given an ip it makes http queries and has allowed us to obtain the country from where they are made. It is a tool that allows you to obtain geolocated information from an IP address.
 ### How to run the PoC
 Both when a get and a post are performed, the remoteAddr is obtained, from which the ip and the country are obtained and these values are put in the ClickProperties when the click is going to be saved or when the ShortUrlProperties ar going to be created.
 ### Tests
-We have implemented 3 tests: the first one tests that with a valid user agent are the corresponding ones.
-The second one tests that with an invalid user agent (for example an empty one) the parse function throws an exception.
-The last one tests that if the parse function returns null values the browser and the platform are the default values.
+We have implemented 3 tests: the first one tests that when API returns a valid response, we can obtain the ip and the country.
+The second one tests that when it returns a bogon country (private network), it returns bogon as the country.
+The last one tests that when API returns an errror, an exception is thrown.
 
 ## URL Accessibility Check
 ### Description
 Ensure that a URL is reachable before allowing it to be shortened.
 ### Libraries
-### Challenges
+We have used WebClient, which has allowed us to make get requests and obtain their response.
+It is a non-blocking, reactive HTTP client in Spring that allows you to perform asynchronous requests to external web services, APIs, or servers. It supports handling various HTTP methods, processing responses, and managing errors efficiently.
 ### How to run the PoC
 Before an url is shortened, it is checked by a get request to see if it is reachable. If it is not, it returns an error and is not shortened.
 ### Tests
+We have implemented 2 tests: one for when the URL is reachable and another one for when the URL is not reachable and then throws and exception.
 
 ## Google Safe Browsing Check
 ### Description
 Validate the safety of a URL using the Google Safe Browsing API, ensuring users are not redirected to malicious sites.
 ### Libraries
-### Challenges
 ### How to run the PoC
 ### Tests
 
@@ -275,16 +277,19 @@ Validate the safety of a URL using the Google Safe Browsing API, ensuring users 
 ### Description
 Enable users to upload a CSV of URLs to shorten, and return a CSV of shortened URLs.
 ### Libraries
-### Challenges
+None
 ### How to run the PoC
 You have to click on the button on the left of the input field that has a paper clip icon and attach a .csv file. As a result, a .csv file will be automatically downloaded with both the original urls and the shortened urls.
 ### Tests
+We have implemented 4 tests: the first one tests that a valid URL is processed correctly. The second one that when a URL is invalid it is thrown an exception. 
+The third one that nothing is processed with an empty URL and the last one that with several URLs are processed correctly.
 
 ## Redirection Limits
 ### Description
 Set limits on redirections, such as a maximum number of redirects over a set time or concurrent redirects for a URL or domain.
 ### Libraries
-### Challenges
+None
 ### How to run the PoC
 The redirection limit is 10. If you click 10 times the same shortened URL, an error will show.
 ### Tests
+We have only one test that checks that it is correctly recognized when reaching a specific redirect limit (3).

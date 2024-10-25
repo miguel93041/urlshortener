@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      IPINFO_API_KEY: ${{ secrets.IPINFO_API_KEY }}
 
     steps:
       - uses: actions/checkout@v2
@@ -27,8 +29,6 @@ jobs:
         run: ./gradlew build --no-daemon
 
       - name: Test with Gradle
-        env:
-          IPINFO_API_KEY: ${{ secrets.IPINFO_API_KEY }}
         run: ./gradlew test --no-daemon
 
       - name: Upload test report

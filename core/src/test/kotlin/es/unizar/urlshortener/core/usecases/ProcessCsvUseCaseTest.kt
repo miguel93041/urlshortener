@@ -1,10 +1,8 @@
 @file:Suppress("WildcardImport")
 package es.unizar.urlshortener.core.usecases
 
-import es.unizar.urlshortener.core.BaseUrlProvider
-import es.unizar.urlshortener.core.Redirection
-import es.unizar.urlshortener.core.ShortUrlProperties
-import es.unizar.urlshortener.core.ShortUrl
+import es.unizar.urlshortener.core.*
+import jakarta.servlet.http.HttpServletRequest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,8 +14,11 @@ import java.time.OffsetDateTime
 class ProcessCsvUseCaseTest {
     private val createShortUrlUseCase = mock(CreateShortUrlUseCase::class.java)
     private val baseUrlProvider = mock(BaseUrlProvider::class.java)
-    private val processCsvUseCase = ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider)
+    private val geoLocation = mock(GeoLocationService::class.java)
+    private val urlAccessibilityCheckUseCase = mock(UrlAccessibilityCheckUseCase::class.java)
+    private val processCsvUseCase = ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider, geoLocation, urlAccessibilityCheckUseCase)
     private val baseUrl = "http://localhost:8080"
+    private val request = mock(HttpServletRequest::class.java)
 
     @BeforeEach
     fun setUp() {
@@ -40,7 +41,7 @@ class ProcessCsvUseCaseTest {
         )
         `when`(createShortUrlUseCase.create(input, ShortUrlProperties())).thenReturn(shortUrl)
 
-        processCsvUseCase.processCsv(reader, writer)
+        processCsvUseCase.processCsv(reader, writer, request)
 
         val expectedOutput = "original-url,shortened-url\nhttp://example.com,${baseUrl}/abc123\n"
         assertEquals(expectedOutput, writer.toString())
@@ -56,7 +57,7 @@ class ProcessCsvUseCaseTest {
         `when`(createShortUrlUseCase.create(input, ShortUrlProperties()))
             .thenThrow(IllegalArgumentException("Invalid URL"))
 
-        processCsvUseCase.processCsv(reader, writer)
+        processCsvUseCase.processCsv(reader, writer, request)
 
         val expectedOutput = "original-url,shortened-url\ninvalid-url,ERROR: Invalid URL\n"
         assertEquals(expectedOutput, writer.toString())
@@ -67,7 +68,7 @@ class ProcessCsvUseCaseTest {
         val reader = StringReader("")
         val writer = StringWriter()
 
-        processCsvUseCase.processCsv(reader, writer)
+        processCsvUseCase.processCsv(reader, writer, request)
 
         val expectedOutput = "original-url,shortened-url\n"
         assertEquals(expectedOutput, writer.toString())
@@ -106,7 +107,7 @@ class ProcessCsvUseCaseTest {
         `when`(createShortUrlUseCase.create("http://another-example.com", ShortUrlProperties()))
             .thenReturn(shortUrl2)
 
-        processCsvUseCase.processCsv(reader, writer)
+        processCsvUseCase.processCsv(reader, writer, request)
 
         val expectedOutput = """
             original-url,shortened-url

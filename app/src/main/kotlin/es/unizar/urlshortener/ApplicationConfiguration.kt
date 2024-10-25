@@ -101,9 +101,13 @@ class ApplicationConfiguration(
      * @return an instance of ProcessCsvUseCaseImpl.
      */
     @Bean
-    fun processCsvUseCase(createShortUrlUseCase: CreateShortUrlUseCase,
-                          baseUrlProvider: BaseUrlProvider): ProcessCsvUseCase {
-        return ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider)
+    fun processCsvUseCase(
+        createShortUrlUseCase: CreateShortUrlUseCase,
+        baseUrlProvider: BaseUrlProvider,
+        geoLocationService: GeoLocationService,
+        urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase
+    ): ProcessCsvUseCase {
+        return ProcessCsvUseCaseImpl(createShortUrlUseCase, baseUrlProvider, geoLocationService, urlAccessibilityCheckUseCase)
     }
 
     /**

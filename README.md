@@ -216,3 +216,75 @@ The following guides illustrate how to use some features concretely:
   Spring](https://spring.io/guides/tutorials/rest/)
 - [Accessing Data with
   JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+
+# Project Report ElectricURL
+## QR Code Generation
+### Description
+Generate a QR code for any shortened URL, offering an alternative access method.
+### Libraries
+### How to run the PoC
+When you write a URL in the input field and click on the shorten button, the QR is automatically generated below the shortened url.
+### Tests
+We have implemented 3 tests: the first one tests that with a valid shortened URL and a valid size a QR is generated.
+The second one tests that with an invalid URL (for example an empty one) the create function throws an exception.
+The last one is similar to the second one but with a null shortened URL.
+
+## Browser and Platform Identification
+### Description
+Analyze HTTP headers to identify the browser (e.g., Chrome, Firefox) and platform (e.g., Windows, macOS, Linux) used during redirection requests.
+### Libraries
+We have used ua-parser library to parser the User-Agent header from the requests and obtain the browser and the platform.
+It is a JavaScript library to detect Browser, Engine, OS, CPU, and Device type/model from User-Agent data with relatively small footprint (~17KB minified, ~6KB gzipped) that can be used either in browser (client-side) or node.js (server-side).
+### How to run the PoC
+When you click on the shortened URL generated, the user-agent header is parsed to obtain the browser and the platform and these values are put in the ClickProperties when the click is going to be saved.
+### Tests
+We have implemented 3 tests: the first one tests that with a valid user agent are the corresponding ones.
+The second one tests that with an invalid user agent (for example an empty one) the parse function throws an exception. 
+The last one tests that if the parse function returns null values the browser and the platform are the default values.
+
+## Geolocation Service
+### Description
+Provide the client’s geographical location based on their IP address. This is useful for tracking both the user requesting a redirection and the user who clicked the shortened URL.
+### Libraries
+### Challenges
+### How to run the PoC
+Both when a get and a post are performed, the remoteAddr is obtained, from which the ip and the country are obtained and these values are put in the ClickProperties when the click is going to be saved or when the ShortUrlProperties ar going to be created.
+### Tests
+We have implemented 3 tests: the first one tests that with a valid user agent are the corresponding ones.
+The second one tests that with an invalid user agent (for example an empty one) the parse function throws an exception.
+The last one tests that if the parse function returns null values the browser and the platform are the default values.
+
+## URL Accessibility Check
+### Description
+Ensure that a URL is reachable before allowing it to be shortened.
+### Libraries
+### Challenges
+### How to run the PoC
+Before an url is shortened, it is checked by a get request to see if it is reachable. If it is not, it returns an error and is not shortened.
+### Tests
+
+## Google Safe Browsing Check
+### Description
+Validate the safety of a URL using the Google Safe Browsing API, ensuring users are not redirected to malicious sites.
+### Libraries
+### Challenges
+### How to run the PoC
+### Tests
+
+## CSV Upload
+### Description
+Enable users to upload a CSV of URLs to shorten, and return a CSV of shortened URLs.
+### Libraries
+### Challenges
+### How to run the PoC
+You have to click on the button on the left of the input field that has a paper clip icon and attach a .csv file. As a result, a .csv file will be automatically downloaded with both the original urls and the shortened urls.
+### Tests
+
+## Redirection Limits
+### Description
+Set limits on redirections, such as a maximum number of redirects over a set time or concurrent redirects for a URL or domain.
+### Libraries
+### Challenges
+### How to run the PoC
+The redirection limit is 10. If you click 10 times the same shortened URL, an error will show.
+### Tests

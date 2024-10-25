@@ -27,7 +27,10 @@ interface CreateQRUseCase {
 /**
  * Implementation of [CreateQRUseCase].
  */
-class CreateQRUseCaseImpl : CreateQRUseCase {
+class CreateQRUseCaseImpl(
+    private val qrCodeWriter: QRCodeWriter,
+    private val byteArrayOutputStream: ByteArrayOutputStream
+) : CreateQRUseCase {
     /**
      * Creates a short URL for the given URL and optional data.
      *
@@ -37,10 +40,12 @@ class CreateQRUseCaseImpl : CreateQRUseCase {
      * @throws InvalidUrlException if the URL is not valid.
      */
     override fun create(url: String, size: Int): ByteArray {
-        val qrCodeWriter = QRCodeWriter()
+        if (url.isEmpty()) {
+            throw InvalidUrlException("URL is invalid")
+        }
+
         val bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, size, size)
         val bufferedImage: BufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix)
-        val byteArrayOutputStream = ByteArrayOutputStream()
         ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream)
         return byteArrayOutputStream.toByteArray()
     }

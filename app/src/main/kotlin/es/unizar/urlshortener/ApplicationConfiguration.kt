@@ -1,5 +1,6 @@
 package es.unizar.urlshortener
 
+import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.GeoLocationService
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.client.WebClient
 import ua_parser.Parser
+import java.io.ByteArrayOutputStream
 
 /**
  * Wires use cases with service implementations, and services implementations with repositories.
@@ -76,12 +78,21 @@ class ApplicationConfiguration(
     fun createShortUrlUseCase() =
         CreateShortUrlUseCaseImpl(shortUrlRepositoryService(), validatorService(), hashService())
 
+    @Bean
+    fun qrCodeWriter(): QRCodeWriter = QRCodeWriter()
+
+    @Bean
+    fun byteArrayOutputStream(): ByteArrayOutputStream = ByteArrayOutputStream()
+
     /**
      * Provides an implementation of the LogClickUseCase.
      * @return an instance of LogClickUseCaseImpl.
      */
     @Bean
-    fun createQRUseCase() = CreateQRUseCaseImpl()
+    fun createQRUseCase(
+        qrCodeWriter: QRCodeWriter,
+        byteArrayOutputStream: ByteArrayOutputStream
+    ) = CreateQRUseCaseImpl(qrCodeWriter, byteArrayOutputStream)
 
     @Bean
     fun ProcessCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")

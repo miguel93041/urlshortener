@@ -27,6 +27,8 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.github.ua-parser:uap-java:1.6.1")
+    implementation("com.google.zxing:core:3.5.2")
+    implementation("com.google.zxing:javase:3.5.2")
 
     // Adds HSQLDB as a runtime-only dependency.
     runtimeOnly(libs.hsqldb)

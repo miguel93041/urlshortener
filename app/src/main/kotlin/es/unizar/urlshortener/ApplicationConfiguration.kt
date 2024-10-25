@@ -121,4 +121,8 @@ class ApplicationConfiguration(
     @Bean
     fun browserPlatformIdentificationUseCase(uaParser: Parser): BrowserPlatformIdentificationUseCase =
         BrowserPlatformIdentificationUseCaseImpl(uaParser)
+
+    @Bean
+    fun urlAccesibilityCheckUseCase(webClient: WebClient): UrlAccessibilityCheckUseCase =
+        UrlAccessibilityCheckUseCaseImpl(webClient)
 }

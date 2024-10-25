@@ -18,6 +18,7 @@ interface UrlAccessibilityCheckUseCase {
 /**
  * Implementation of [UrlAccessibilityCheckUseCase].
  */
+@Suppress("TooGenericExceptionCaught", "SwallowedException")
 class UrlAccessibilityCheckUseCaseImpl(
     private val webClient: WebClient
 ) : UrlAccessibilityCheckUseCase {

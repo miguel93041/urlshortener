@@ -57,12 +57,16 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var browserPlatformIdentificationUseCase: BrowserPlatformIdentificationUseCase
 
+    @MockBean
+    private lateinit var urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase
+
     /**
      * Tests that `redirectTo` returns a redirect when the key exists.
      */
     @Test
     fun `redirectTo returns a redirect when the key exists`() {
         // Mock the behavior of redirectUseCase to return a redirection URL
+        given(urlAccessibilityCheckUseCase.isUrlReachable(Mockito.anyString())).willReturn(true)
         given(redirectUseCase.redirectTo("key")).willReturn(Redirection("http://example.com/"))
         given(redirectionLimitUseCase.isRedirectionLimit(Mockito.anyString())).willReturn(false)
         given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
@@ -86,6 +90,7 @@ class UrlShortenerControllerTest {
     @Test
     fun `redirectTo returns a not found when the key does not exist`() {
         // Mock the behavior of redirectUseCase to throw a RedirectionNotFound exception
+        given(urlAccessibilityCheckUseCase.isUrlReachable(Mockito.anyString())).willReturn(true)
         given(redirectUseCase.redirectTo("key"))
             .willAnswer { throw RedirectionNotFound("key") }
         given(redirectionLimitUseCase.isRedirectionLimit(Mockito.anyString())).willReturn(false)
@@ -110,6 +115,7 @@ class UrlShortenerControllerTest {
     @Test
     fun `creates returns a basic redirect if it can compute a hash`() {
         // Mock the behavior of createShortUrlUseCase to return a ShortUrl object
+        given(urlAccessibilityCheckUseCase.isUrlReachable(Mockito.anyString())).willReturn(true)
         given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
         given(createQRUseCase.create(Mockito.anyString(), Mockito.anyInt())).willReturn(byteArrayOf())
         given(
@@ -137,6 +143,7 @@ class UrlShortenerControllerTest {
     @Test
     fun `creates returns bad request if it can compute a hash`() {
         // Mock the behavior of createShortUrlUseCase to throw an InvalidUrlException
+        given(urlAccessibilityCheckUseCase.isUrlReachable(Mockito.anyString())).willReturn(true)
         given(geoLocationService.get(Mockito.anyString())).willReturn(GeoLocation("127.0.0.1", "Bogon"))
         given(createQRUseCase.create(Mockito.anyString(), Mockito.anyInt())).willReturn(byteArrayOf())
         given(

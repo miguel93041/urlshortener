@@ -5,6 +5,7 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.GeoLocationService
 
 import es.unizar.urlshortener.core.ShortUrlProperties
+import es.unizar.urlshortener.core.UrlValidationService
 import es.unizar.urlshortener.core.usecases.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
@@ -136,7 +137,7 @@ class UrlShortenerControllerImpl(
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> {
         val geoLocation = geoLocationService.get(request.remoteAddr)
 
-        val isSafe = urlValidationService.validate(data.url).isSafe
+        val isSafe = urlValidationService.isSafe(data.url)
 
         if (!isSafe) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ShortUrlDataOut())

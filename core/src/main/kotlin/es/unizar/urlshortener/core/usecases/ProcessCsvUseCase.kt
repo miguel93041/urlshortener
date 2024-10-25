@@ -1,7 +1,6 @@
 package es.unizar.urlshortener.core.usecases
 
 import es.unizar.urlshortener.core.ShortUrlProperties
-import es.unizar.urlshortener.core.usecases.UrlValidationService
 import java.io.InputStreamReader
 import java.io.StringWriter
 

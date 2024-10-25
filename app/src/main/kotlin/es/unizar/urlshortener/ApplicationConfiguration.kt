@@ -3,6 +3,7 @@ package es.unizar.urlshortener
 
 import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.GeoLocationService
+import es.unizar.urlshortener.core.UrlValidationService
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl

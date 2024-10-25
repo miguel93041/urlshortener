@@ -1,8 +1,7 @@
 package es.unizar.urlshortener.thirdparties.ipinfo
 
 
-import es.unizar.urlshortener.core.usecases.UrlValidationService
-import es.unizar.urlshortener.core.usecases.UrlValidationResult
+import es.unizar.urlshortener.core.UrlValidationService
 import io.github.cdimascio.dotenv.Dotenv
 import org.springframework.context.annotation.Primary
 
@@ -16,13 +15,13 @@ class UrlSafetyServiceImpl (
     dotenv: Dotenv
 ) : UrlValidationService {
 
-    private val apiKey = dotenv["GOOGLE_API_KEY"]
+    private val accessToken = dotenv[DOTENV_SAFEBROWSING_KEY]
 
+    override fun isSafe(url: String): Boolean {
+        val requestUrl = buildRequestUrl()
 
-    override fun validate(url: String): UrlValidationResult {
-        System.out.println(url)
         val response = webClient.post()
-            .uri("https://safebrowsing.googleapis.com/v4/threatMatches:find?key=$apiKey")
+            .uri(requestUrl)
             .bodyValue(createRequestBody(url))
             .retrieve()
             .onStatus({ status -> status.isError }) { response ->
@@ -32,8 +31,8 @@ class UrlSafetyServiceImpl (
             }
             .bodyToMono(Map::class.java)
             .block()
-        System.out.println(response)
-        return processResponse(response)
+
+        return !isDangerous(response)
     }
 
     private fun createRequestBody(url: String): Map<String, Any> {
@@ -51,11 +50,16 @@ class UrlSafetyServiceImpl (
         )
     }
 
-    private fun processResponse(response: Map<*, *>?): UrlValidationResult {
-        return if (response?.containsKey("matches") == true) {
-            UrlValidationResult(isSafe = false, statusCode = 403)
-        } else{
-            UrlValidationResult(isSafe = true, statusCode = 201)
-        }
+    private fun isDangerous(response: Map<*, *>?): Boolean {
+        return response?.containsKey("matches") == true
+    }
+
+    private fun buildRequestUrl(): String {
+        return "${SAFEBROWSING_BASE_URL}v4/threatMatches:find?key=$accessToken"
+    }
+
+    companion object {
+        const val DOTENV_SAFEBROWSING_KEY = "GOOGLE_API_KEY"
+        const val SAFEBROWSING_BASE_URL = "https://safebrowsing.googleapis.com/"
     }
 }

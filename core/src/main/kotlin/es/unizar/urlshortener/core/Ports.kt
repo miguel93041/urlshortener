@@ -67,3 +67,7 @@ interface HashService {
 interface GeoLocationService {
     fun get(ip: String): GeoLocation
 }
+
+interface UrlValidationService {
+    fun isSafe(url: String): Boolean
+}

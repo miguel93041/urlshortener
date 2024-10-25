@@ -18,7 +18,8 @@ class BrowserPlatformIdentificationUseCaseTest {
 
     @Test
     fun `should return correct browser and platform when userAgent is valid`() {
-        val userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        val userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) " +
+                "Chrome/91.0.4472.124 Safari/537.36"
 
         val userAgent = UserAgent("Chrome", "91", "0", "4472")
         val os = OS("Windows", "10", "", "", "")

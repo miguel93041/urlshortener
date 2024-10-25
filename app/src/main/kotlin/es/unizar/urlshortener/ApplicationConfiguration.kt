@@ -1,3 +1,4 @@
+@file:Suppress("WildcardImport")
 package es.unizar.urlshortener
 
 import com.google.zxing.qrcode.QRCodeWriter
@@ -23,6 +24,7 @@ import java.io.ByteArrayOutputStream
  *
  * **Note**: Spring Boot is able to discover this [Configuration] without further configuration.
  */
+@Suppress("TooManyFunctions")
 @Configuration
 class ApplicationConfiguration(
     @Autowired val shortUrlEntityRepository: ShortUrlEntityRepository,
@@ -96,7 +98,7 @@ class ApplicationConfiguration(
     ) = CreateQRUseCaseImpl(qrCodeWriter, byteArrayOutputStream)
 
     @Bean
-    fun ProcessCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")
+    fun processCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")
 
     @Bean
     fun redirectionCountRepository(): RedirectionCountRepository {

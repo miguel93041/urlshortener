@@ -1,3 +1,4 @@
+@file:Suppress("ForbiddenComment")
 package es.unizar.urlshortener.thirdparties.ipinfo
 
 import es.unizar.urlshortener.core.GeoLocationService
@@ -13,7 +14,7 @@ import reactor.core.publisher.Mono
 
 // TODO: Test if API key is wrong
 // TODO: Test ip4 and ip6 independently
-class GeoLocationServiceImplTest {
+class GeoLocationServiceTest {
 
     private var webClient: WebClient = Mockito.mock(WebClient::class.java)
 

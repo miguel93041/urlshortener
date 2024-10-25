@@ -50,6 +50,7 @@ class UrlShortenerControllerTest {
     @MockBean
     private lateinit var redirectionLimitUseCase: RedirectionLimitUseCase
 
+    @Suppress("UnusedPrivateProperty")
     @MockBean
     private lateinit var processCsvUseCase: ProcessCsvUseCase
 

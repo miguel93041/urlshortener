@@ -1,3 +1,4 @@
+@file:Suppress("ForbiddenComment")
 package es.unizar.urlshortener.thirdparties.ipinfo
 
 import es.unizar.urlshortener.core.GeoLocation

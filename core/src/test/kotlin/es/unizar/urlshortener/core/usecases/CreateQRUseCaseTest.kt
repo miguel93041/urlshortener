@@ -6,12 +6,13 @@ import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.InvalidUrlException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 import org.mockito.kotlin.whenever
 import java.io.ByteArrayOutputStream
 import kotlin.test.Test
 
-class CreateQRUseCaseImplTest {
+class CreateQRUseCaseTest {
     private val qrCodeWriter: QRCodeWriter = mock()
     private val byteArrayOutputStream: ByteArrayOutputStream = mock()
     private val createQRUseCase = CreateQRUseCaseImpl(qrCodeWriter, byteArrayOutputStream)

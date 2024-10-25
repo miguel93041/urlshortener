@@ -38,8 +38,6 @@ class ProcessCsvUseCaseImpl (
     private val createShortUrlUseCase: CreateShortUrlUseCase,
     private val baseUrlProvider: BaseUrlProvider
 ) : ProcessCsvUseCase {
-    override fun processCsv(reader: InputStreamReader, createShortUrlUseCase: CreateShortUrlUseCase): String {
-        val result = StringWriter()
 
     /**
      * Processes the input CSV from the provided Reader, creates shortened URLs for each entry,

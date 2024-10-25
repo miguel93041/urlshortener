@@ -5,7 +5,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 import es.unizar.urlshortener.core.BaseUrlProvider
 import es.unizar.urlshortener.core.BaseUrlProviderImpl
 import es.unizar.urlshortener.core.GeoLocationService
-import es.unizar.urlshortener.core.UrlValidationService
+import es.unizar.urlshortener.core.UrlSafetyService
 import es.unizar.urlshortener.core.usecases.*
 import es.unizar.urlshortener.infrastructure.delivery.HashServiceImpl
 import es.unizar.urlshortener.infrastructure.delivery.ValidatorServiceImpl
@@ -158,7 +158,7 @@ class ApplicationConfiguration(
      * @return an instance of Parser.
      */
     @Bean
-    fun urlSafetyService(webClient: WebClient, dotEnv: Dotenv): UrlValidationService {
+    fun urlSafetyService(webClient: WebClient, dotEnv: Dotenv): UrlSafetyService {
         return UrlSafetyServiceImpl(webClient, dotEnv)
     }
 

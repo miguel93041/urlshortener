@@ -1,21 +1,16 @@
 package es.unizar.urlshortener.thirdparties.ipinfo
 
 
-import es.unizar.urlshortener.core.UrlValidationService
+import es.unizar.urlshortener.core.UrlSafetyService
 import io.github.cdimascio.dotenv.Dotenv
-import org.springframework.context.annotation.Primary
-
-import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 
-@Service
-@Primary
 class UrlSafetyServiceImpl (
     private val webClient: WebClient,
     dotenv: Dotenv
-) : UrlValidationService {
+) : UrlSafetyService {
 
-    private val accessToken = dotenv[DOTENV_SAFEBROWSING_KEY]
+    private val accessToken = System.getenv(DOTENV_SAFEBROWSING_KEY) ?: dotenv[DOTENV_SAFEBROWSING_KEY]
 
     override fun isSafe(url: String): Boolean {
         val requestUrl = buildRequestUrl()

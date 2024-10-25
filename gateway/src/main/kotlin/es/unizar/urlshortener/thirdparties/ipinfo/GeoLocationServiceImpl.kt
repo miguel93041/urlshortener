@@ -4,7 +4,6 @@ package es.unizar.urlshortener.thirdparties.ipinfo
 import es.unizar.urlshortener.core.GeoLocation
 import es.unizar.urlshortener.core.GeoLocationService
 import io.github.cdimascio.dotenv.Dotenv
-import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 
 /**
@@ -12,7 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient
  * It provides functionality to retrieve geographical information based on an IP address
  * using the IPInfo API. This class utilizes a [WebClient] for making HTTP requests.
  */
-@Service
 class GeoLocationServiceImpl(
     private val webClient: WebClient,
     dotenv: Dotenv

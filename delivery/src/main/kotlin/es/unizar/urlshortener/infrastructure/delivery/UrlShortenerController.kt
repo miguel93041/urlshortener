@@ -5,6 +5,7 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.GeoLocationService
 
 import es.unizar.urlshortener.core.ShortUrlProperties
+import es.unizar.urlshortener.core.UrlSafetyService
 import es.unizar.urlshortener.core.usecases.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
@@ -20,12 +21,10 @@ import java.net.URI
 
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.core.io.ByteArrayResource
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.io.StringWriter
 
 /**
  * The specification of the controller.
@@ -81,7 +80,7 @@ class UrlShortenerControllerImpl(
     val browserPlatformIdentificationUseCase: BrowserPlatformIdentificationUseCase,
     val processCsvUseCase: ProcessCsvUseCase,
     val urlAccessibilityCheckUseCase: UrlAccessibilityCheckUseCase,
-    val urlValidationService: UrlValidationService,
+    val urlValidationService: UrlSafetyService,
 ) : UrlShortenerController {
 
     /**

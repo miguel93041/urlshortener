@@ -7,6 +7,11 @@ import io.github.cdimascio.dotenv.Dotenv
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 
+/**
+ * [GeoLocationServiceImpl] is an implementation of the [GeoLocationService] interface.
+ * It provides functionality to retrieve geographical information based on an IP address
+ * using the IPInfo API. This class utilizes a [WebClient] for making HTTP requests.
+ */
 @Service
 class GeoLocationServiceImpl(
     private val webClient: WebClient,
@@ -15,8 +20,14 @@ class GeoLocationServiceImpl(
 
     private val accessToken = dotenv[DOTENV_IPINFO_KEY]
 
-
-    // TODO: Custom IP class that validates and checks for IPv4 or IPv6 format
+    /**
+     * Retrieves geographical information for the specified IP address.
+     *
+     * @param ip The IP address for which to obtain geographical data.
+     * @return A [GeoLocation] object containing the IP address and associated country.
+     *
+     * **TODO**: Implement a custom IP class that validates and checks for IPv4 or IPv6 format.
+     */
     override fun get(ip: String): GeoLocation {
         val url = buildRequestUrl(ip)
 
@@ -37,7 +48,15 @@ class GeoLocationServiceImpl(
         return GeoLocation(ipAddress, country)
     }
 
-    // TODO: Adapt request URL to IP format (If IP4 or IP6 IPInfo endpoint differs)
+    /**
+     * Builds the request URL for the IPInfo API using the provided IP address.
+     *
+     * @param ip The IP address to be used in the request URL.
+     * @return The complete URL string for the API request.
+     *
+     * **TODO**: Adapt request URL to handle different formats for IPv4 and IPv6,
+     * as the IPInfo endpoint may differ based on the format.
+     */
     private fun buildRequestUrl(ip: String): String {
         return "${IPINFO_BASE_URL}$ip?token=$accessToken"
     }

@@ -5,14 +5,15 @@ import es.unizar.urlshortener.core.InvalidUrlException
 import ua_parser.Parser
 
 /**
- * Given a user agent request returns its browser and platform.
+ * Interface for identifying the browser and platform from a user agent string.
  */
 interface BrowserPlatformIdentificationUseCase {
     /**
-     * Parse the user agent header used during redirection requests.
+     * Parses the user agent string received in a redirection request to identify
+     * the browser and platform being used.
      *
-     * @param userAgent The user agent header request.
-     * @return The browser and platform used during redirection requests.
+     * @param userAgent The user agent header from the request.
+     * @return A BrowserPlatform object containing the identified browser and platform.
      */
     fun parse(userAgent: String): BrowserPlatform
 }
@@ -24,11 +25,11 @@ class BrowserPlatformIdentificationUseCaseImpl(
     private val parser: Parser
 ) : BrowserPlatformIdentificationUseCase {
     /**
-     * Parse the user agent header used during redirection requests.
+     * Parses the user agent string to identify the browser and platform.
      *
-     * @param userAgent The user agent header request.
-     * @return The browser and platform used during redirection requests.
-     * @throws InvalidUrlException if the URL is not valid.
+     * @param userAgent The user agent header from the request.
+     * @return A BrowserPlatform object containing the identified browser and platform.
+     * @throws InvalidUrlException if the provided user agent string is empty or invalid.
      */
     override fun parse(userAgent: String): BrowserPlatform {
         if (userAgent.isBlank()) {

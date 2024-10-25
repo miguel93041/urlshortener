@@ -11,15 +11,15 @@ import javax.imageio.ImageIO
 import java.io.ByteArrayOutputStream
 
 /**
- * Given a shortened url returns a base64 representation of the QR.
+ * Interface for generating a base64-encoded QR code for a shortened URL.
  */
 interface CreateQRUseCase {
     /**
-     * Creates a QR for the given shortened URL with the given size in pixels.
+     * Generates a QR code for a given shortened URL with specified size (in pixels).
      *
-     * @param url The shortened URL.
-     * @param size The width and height of the QR
-     * @return A base64 representation [String] of the QR.
+     * @param url The shortened URL to encode in the QR code.
+     * @param size The width and height (in pixels) of the QR code.
+     * @return A base64-encoded [ByteArray] representation of the QR code.
      */
     fun create(url: String, size: Int): ByteArray
 }
@@ -31,12 +31,12 @@ class CreateQRUseCaseImpl(
     private val qrCodeWriter: QRCodeWriter
 ) : CreateQRUseCase {
     /**
-     * Creates a short URL for the given URL and optional data.
+     * Generates a QR code for the given shortened URL with the specified size.
      *
-     * @param url The URL to be shortened.
-     * @param data The optional properties for the short URL.
-     * @return The created [ShortUrl] entity.
-     * @throws InvalidUrlException if the URL is not valid.
+     * @param url The shortened URL to encode in the QR code.
+     * @param size The width and height (in pixels) of the QR code.
+     * @return A base64-encoded [ByteArray] representation of the QR code.
+     * @throws InvalidUrlException if the URL is invalid or empty.
      */
     override fun create(url: String, size: Int): ByteArray {
         if (url.isEmpty()) {

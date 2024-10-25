@@ -84,18 +84,12 @@ class ApplicationConfiguration(
     @Bean
     fun qrCodeWriter(): QRCodeWriter = QRCodeWriter()
 
-    @Bean
-    fun byteArrayOutputStream(): ByteArrayOutputStream = ByteArrayOutputStream()
-
     /**
      * Provides an implementation of the LogClickUseCase.
      * @return an instance of LogClickUseCaseImpl.
      */
     @Bean
-    fun createQRUseCase(
-        qrCodeWriter: QRCodeWriter,
-        byteArrayOutputStream: ByteArrayOutputStream
-    ) = CreateQRUseCaseImpl(qrCodeWriter, byteArrayOutputStream)
+    fun createQRUseCase(qrCodeWriter: QRCodeWriter) = CreateQRUseCaseImpl(qrCodeWriter)
 
     @Bean
     fun processCsvUseCase() = ProcessCsvUseCaseImpl("http://localhost:8080")

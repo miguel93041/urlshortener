@@ -66,7 +66,7 @@ $(document).ready(function () {
                         + request.getResponseHeader('Location')
                         + "'>"
                         + request.getResponseHeader('Location')
-                        + `</a><img src=${imgSrc} alt='Generated QR Code' /></div>`);
+                        + `</a></br><img src=${imgSrc} alt='Generated QR Code' /></div>`);
 
                     // Limpiar el campo de entrada de URL
                     $("#urlInput").val('');

@@ -28,8 +28,7 @@ interface CreateQRUseCase {
  * Implementation of [CreateQRUseCase].
  */
 class CreateQRUseCaseImpl(
-    private val qrCodeWriter: QRCodeWriter,
-    private val byteArrayOutputStream: ByteArrayOutputStream
+    private val qrCodeWriter: QRCodeWriter
 ) : CreateQRUseCase {
     /**
      * Creates a short URL for the given URL and optional data.
@@ -46,7 +45,8 @@ class CreateQRUseCaseImpl(
 
         val bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, size, size)
         val bufferedImage: BufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix)
-        ImageIO.write(bufferedImage, "PNG", byteArrayOutputStream)
-        return byteArrayOutputStream.toByteArray()
+        val outputByteArray = ByteArrayOutputStream()
+        ImageIO.write(bufferedImage, "PNG", outputByteArray)
+        return outputByteArray.toByteArray()
     }
 }

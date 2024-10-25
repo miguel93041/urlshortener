@@ -4,10 +4,7 @@ import es.unizar.urlshortener.core.ClickProperties
 import es.unizar.urlshortener.core.GeoLocationService
 
 import es.unizar.urlshortener.core.ShortUrlProperties
-import es.unizar.urlshortener.core.usecases.CreateQRUseCase
-import es.unizar.urlshortener.core.usecases.CreateShortUrlUseCase
-import es.unizar.urlshortener.core.usecases.LogClickUseCase
-import es.unizar.urlshortener.core.usecases.RedirectUseCase
+import es.unizar.urlshortener.core.usecases.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.hateoas.server.mvc.linkTo
 import org.springframework.http.HttpHeaders
@@ -19,8 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 import java.net.URI
-import es.unizar.urlshortener.core.usecases.ProcessCsvUseCase
-import es.unizar.urlshortener.core.usecases.RedirectionLimitUseCase
 
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
@@ -76,7 +71,8 @@ class UrlShortenerControllerImpl(
     val createShortUrlUseCase: CreateShortUrlUseCase,
     val qrUseCase: CreateQRUseCase,
     val geoLocationService: GeoLocationService,
-    val redirectionLimitUseCase: RedirectionLimitUseCase,  // Añadimos el nuevo caso de uso
+    val redirectionLimitUseCase: RedirectionLimitUseCase,
+    val browserPlatformIdentificationUseCase: BrowserPlatformIdentificationUseCase,
     val processCsvUseCase: ProcessCsvUseCase,
 ) : UrlShortenerController {
 
@@ -87,16 +83,22 @@ class UrlShortenerControllerImpl(
      * @param request the HTTP request
      * @return a ResponseEntity with the redirection details
      */
-    @GetMapping("/{id:(?!api|index).*}")
+    @GetMapping("/{id:(?!api|index|favicon\\.ico).*}")
     override fun redirectTo(@PathVariable id: String, request: HttpServletRequest): ResponseEntity<Unit> {
         // Verifica si se ha alcanzado el límite de redirecciones
         if (redirectionLimitUseCase.isRedirectionLimit(id)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build()
         }
         val geoLocation = geoLocationService.get(request.remoteAddr)
+        val browserPlatform = browserPlatformIdentificationUseCase.parse(request.getHeader("User-Agent"))
 
-        return redirectUseCase.redirectTo(id).run {
-            logClickUseCase.logClick(id, ClickProperties(ip = geoLocation.ip, country = geoLocation.country))
+            return redirectUseCase.redirectTo(id).run {
+            logClickUseCase.logClick(id, ClickProperties(
+                ip = geoLocation.ip,
+                country = geoLocation.country,
+                browser = browserPlatform.browser,
+                platform = browserPlatform.platform
+            ))
             val h = HttpHeaders()
             h.location = URI.create(target)
             ResponseEntity<Unit>(h, HttpStatus.valueOf(mode))
@@ -131,7 +133,6 @@ class UrlShortenerControllerImpl(
      */
     @PostMapping("/api/link", consumes = [MediaType.APPLICATION_FORM_URLENCODED_VALUE])
     override fun shortener(data: ShortUrlDataIn, request: HttpServletRequest): ResponseEntity<ShortUrlDataOut> {
-        val userAgent = request.getHeader("User-Agent")
         val geoLocation = geoLocationService.get(request.remoteAddr)
 
         return createShortUrlUseCase.create(

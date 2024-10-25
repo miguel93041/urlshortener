@@ -26,6 +26,7 @@ dependencies {
     implementation(libs.jquery)
 
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("com.github.ua-parser:uap-java:1.6.1")
 
     // Adds HSQLDB as a runtime-only dependency.
     runtimeOnly(libs.hsqldb)

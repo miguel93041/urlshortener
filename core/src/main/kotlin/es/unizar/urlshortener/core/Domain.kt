@@ -57,3 +57,8 @@ data class GeoLocation(
     val ip: String,
     val country: String
 )
+
+data class BrowserPlatform(
+    val browser: String,
+    val platform: String
+)

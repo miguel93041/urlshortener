@@ -18,7 +18,7 @@ class GeoLocationServiceImpl(
     dotenv: Dotenv
 ) : GeoLocationService {
 
-    private val accessToken = dotenv[DOTENV_IPINFO_KEY]
+    private val accessToken = System.getenv(DOTENV_IPINFO_KEY) ?: dotenv[DOTENV_IPINFO_KEY]
 
     /**
      * Retrieves geographical information for the specified IP address.
@@ -58,7 +58,7 @@ class GeoLocationServiceImpl(
      * as the IPInfo endpoint may differ based on the format.
      */
     private fun buildRequestUrl(ip: String): String {
-        return "${IPINFO_BASE_URL}$ip?token=$accessToken"
+        return "${IPINFO_BASE_URL}${ip}?token=${accessToken}"
     }
 
     companion object {
